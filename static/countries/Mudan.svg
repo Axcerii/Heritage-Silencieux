@@ -1,0 +1,27 @@
+<svg id="Calque_1" data-name="Calque 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 898.3 1011.8">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-miterlimit: 10;
+        stroke-width: 15px;
+      }
+    </style>
+  </defs>
+  <polygon class="cls-1" points="610.9 224.9 286.4 224.9 124.2 505.9 286.4 786.9 610.9 786.9 773.1 505.9 610.9 224.9"/>
+  <path class="cls-1" d="M956,1038.3C714.7,1005,608,619.7,766.7,697S956,603.7,956,603.7s30.7,170.6,189.3,93.3S1197.3,1005,956,1038.3Z" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1145.3,383C986.7,305.7,956,476.3,956,476.3S925.3,305.7,766.7,383,714.7,75,956,41.7C1197.3,75,1304,460.3,1145.3,383Z" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1003.3,524h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1178.8,635.5c-12.3-175-173.5-118-175.5-117.3,1.8-1.5,131.5-112.6-13.8-210.7s240.7-199,390.2-6.7C1471.5,526.5,1191.2,811.6,1178.8,635.5Z" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1003.3,524h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1378.7,779.1c-149.5,192.4-536.5,92.1-390.2-6.7s15.6-209.1,13.8-210.6c2,.7,163.2,57.7,175.5-117.3S1470.5,553.5,1378.7,779.1Z" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1002.3,567.7h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M1002.3,567.7h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M533.6,779.7C441.8,554,722.2,268.9,734.5,445S908,563,910,562.3c-1.7,1.5-131.5,112.6,13.9,210.7S683.1,972,533.6,779.7Z" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M908.7,572.3h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M908.7,572.3h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M909.7,528.7h0" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M923.5,308.1c-145.3,98-15.6,209.1-13.8,210.6-2-.7-163.2-57.7-175.5,117.3S441.5,527,533.3,301.4C682.8,109,1069.8,209.3,923.5,308.1Z" transform="translate(-507.3 -34.1)"/>
+  <path class="cls-1" d="M909.7,528.7h0" transform="translate(-507.3 -34.1)"/>
+</svg>

@@ -1,0 +1,38 @@
+<svg id="Calque_1" data-name="Calque 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 813.8 828.1">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: none;
+        stroke: #000;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 21px;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="cls-1" d="M605.3,562.7A108.7,108.7,0,1,1,523,432.8,108.7,108.7,0,0,1,605.3,562.7Z" transform="translate(-90.6 -63.7)"/>
+    <polyline class="cls-1" points="406.6 10.5 324.2 40.2 236.6 238 312.5 424.5"/>
+    <polyline class="cls-1" points="504.3 423.8 578.7 236.8 489.6 39.6 407 10.6"/>
+    <polyline class="cls-1" points="553.7 181.4 702.7 146 776.2 193.6"/>
+    <polyline class="cls-1" points="506.3 521.5 700.2 467.6 803.3 277.3 776.4 194"/>
+    <polyline class="cls-1" points="261.6 181.6 110 146.9 36.9 195.1"/>
+    <polyline class="cls-1" points="309.4 520.8 115 468.5 10.5 279 36.7 195.5"/>
+    <polyline class="cls-1" points="386.4 582.2 481 757.2 689.4 815.4 764.7 770.7"/>
+    <polyline class="cls-1" points="655.8 479.9 699.5 494 795 688.1 764.9 770.4"/>
+    <path class="cls-1" d="M746.4,543.6" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M598.5,496.2" transform="translate(-90.6 -63.7)"/>
+    <polyline class="cls-1" points="409.3 624.5 338.7 757.8 130.8 817.6 55.1 773.5"/>
+    <polyline class="cls-1" points="163.1 481.4 118.1 496.2 24.1 691.1 54.9 773.1"/>
+    <path class="cls-1" d="M253.7,545.1" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M399.9,497" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M310.6,358.5a15.9,15.9,0,1,1-15.5-16.2A15.8,15.8,0,0,1,310.6,358.5Z" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M397.7,491.2S266.9,429,281.3,369.1" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M693.5,361.9a15.9,15.9,0,1,0,16.2-15.5A15.9,15.9,0,0,0,693.5,361.9Z" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M597.8,492.1S730.9,435.3,719,374.8" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M304.2,713.1A15.9,15.9,0,1,0,288,728.6,15.8,15.8,0,0,0,304.2,713.1Z" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M399.9,582.9S266.8,639.7,278.7,700.2" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M689,719.3a15.9,15.9,0,1,1,31.7.6,15.9,15.9,0,0,1-31.7-.6Z" transform="translate(-90.6 -63.7)"/>
+    <path class="cls-1" d="M598.6,585.3s130.8,62.1,116.5,122.1" transform="translate(-90.6 -63.7)"/>
+  </g>
+</svg>
