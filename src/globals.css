@@ -1,0 +1,75 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@theme {
+    --color-Artrish: #fff;
+    --color-Yinva: #E5B8CC;
+    --color-Guizamark: #CFDFC4;
+    --color-Shizari: #1b1b1b;
+    --color-Pestia: #615DD3;
+    --color-Chronos: #CA4444;
+    --color-Aqua: #a6a6a6;
+    --color-Goliath: #84583C;
+    --color-Drii: #803084;
+    --color-Lada: #F3F09E;
+    --color-Pura: #D2B674;
+
+    --color-foreground: #fff;
+    --color-background: #1b1b1b;
+    --color-accent: #E5B8CC;
+    --color-primary: #CFDFC4;
+    --color-secondary: #D2B674;
+    --font-text: 'El Messiri', sans-serif;
+    --font-title: 'EB Garamond', serif;
+}
+
+:root {
+    --radius: 5px;
+}
+
+html {
+    background-color: var(--background);
+    background-image: url("/soft-neige1B1B1B.png");
+    color: var(--foreground);
+    font-family: var(--textFont);
+    font-size: 20px;
+}
+
+.primary-svg {
+    filter: invert(90%) sepia(13%) saturate(311%) hue-rotate(52deg) brightness(101%) contrast(81%);
+}
+
+.accent-svg {
+    filter: invert(78%) sepia(52%) saturate(214%) hue-rotate(293deg) brightness(95%) contrast(88%);
+}
+
+.secondary-svg {
+    filter: invert(76%) sepia(57%) saturate(281%) hue-rotate(2deg) brightness(88%) contrast(87%);
+}
+
+input {
+    background-color: var(--color-primary);
+    border: var(--color-foreground) 1px solid;
+    border-radius: var(--radius);
+    font-size: 20px;
+    width: 100%;
+    height: 48px;
+    font-family: var(--font-text);
+
+    box-sizing: border-box;
+    padding: 0 1rem;
+}
+
+input::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-title);
+}
