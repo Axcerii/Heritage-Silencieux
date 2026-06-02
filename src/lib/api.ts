@@ -1,0 +1,250 @@
+const BACKEND_BASE = 'http://localhost:3000';
+
+export interface Club {
+    id: string;
+    name: string;
+    slug: string;
+    isActive: boolean;
+}
+
+export interface Book {
+    id: string;
+    title: string;
+    author: string;
+    genre: string;
+    pages: number;
+    isActive: boolean;
+    clubId: string;
+    createdAt: string;
+    updatedAt: string;
+    averageRating: number | null;
+}
+
+export interface ClubMember {
+    userId: string;
+    clubId: string;
+    role: 'OWNER' | 'EDITOR' | 'READER';
+    joinedAt: string;
+    user: {
+        id: string;
+        email: string;
+        name: string | null;
+        image: string | null;
+    };
+}
+
+export interface Chapter {
+    id: string;
+    index: number;
+    title: string;
+    content: string;
+    bookId: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Review {
+    id: string;
+    rating: number;
+    comment: string | null;
+    userId: string;
+    bookId: string;
+    createdAt: string;
+    updatedAt: string;
+    user: {
+        id: string;
+        name: string | null;
+        image: string | null;
+    };
+}
+
+export interface Progression {
+    id: string;
+    userId: string;
+    bookId: string;
+    currentPage: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface MemberProgression {
+    id: string;
+    userId: string;
+    bookId: string;
+    currentPage: number;
+    user: {
+        id: string;
+        name: string | null;
+    };
+}
+
+async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
+    const url = `${BACKEND_BASE}${path}`;
+    const headers = {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+    };
+
+    const response = await fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include'
+    });
+
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ message: 'Request failed' }));
+        throw new Error(errorData.message || `API error: ${response.status}`);
+    }
+
+    // For file exports or content that isn't JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && !contentType.includes('application/json')) {
+        return (await response.text()) as unknown as T;
+    }
+
+    return response.json();
+}
+
+// --- CLUBS ---
+export function getClubs(): Promise<Club[]> {
+    return apiRequest<Club[]>('/clubs');
+}
+
+export function getClubDetails(clubId: string): Promise<Club> {
+    return apiRequest<Club>(`/clubs/${clubId}`);
+}
+
+export function createClub(name: string, slug?: string): Promise<Club> {
+    return apiRequest<Club>('/clubs', {
+        method: 'POST',
+        body: JSON.stringify({ name, slug })
+    });
+}
+
+export function updateClub(clubId: string, data: { name?: string; slug?: string; isActive?: boolean }): Promise<Club> {
+    return apiRequest<Club>(`/clubs/${clubId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    });
+}
+
+export function deleteClub(clubId: string): Promise<Club> {
+    return apiRequest<Club>(`/clubs/${clubId}`, {
+        method: 'DELETE'
+    });
+}
+
+// --- CLUB MEMBERS ---
+export function getClubMembers(clubSlug: string): Promise<ClubMember[]> {
+    return apiRequest<ClubMember[]>(`/clubs/${clubSlug}/members`);
+}
+
+export function addClubMember(clubSlug: string, email: string): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/members`, {
+        method: 'POST',
+        body: JSON.stringify({ email })
+    });
+}
+
+export function updateClubMemberRole(clubSlug: string, userId: string, role: 'OWNER' | 'EDITOR' | 'READER'): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/members/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role })
+    });
+}
+
+export function removeClubMember(clubSlug: string, userId: string): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/members/${userId}`, {
+        method: 'DELETE'
+    });
+}
+
+// --- BOOKS ---
+export function getBooks(clubSlug: string): Promise<Book[]> {
+    return apiRequest<Book[]>(`/clubs/${clubSlug}/books`);
+}
+
+export function getBookDetails(clubSlug: string, bookId: string): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`);
+}
+
+export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages: number }): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+}
+
+export function updateBook(clubSlug: string, bookId: string, data: { title?: string; author?: string; genre?: string; pages?: number; isActive?: boolean }): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    });
+}
+
+export function deleteBook(clubSlug: string, bookId: string): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`, {
+        method: 'DELETE'
+    });
+}
+
+export function exportLibraryCsv(clubSlug: string): Promise<string> {
+    return apiRequest<string>(`/clubs/${clubSlug}/books/export`);
+}
+
+// --- CHAPTERS ---
+export function getChapters(clubSlug: string, bookId: string): Promise<Chapter[]> {
+    return apiRequest<Chapter[]>(`/clubs/${clubSlug}/books/${bookId}/chapters`);
+}
+
+export function getChapter(clubSlug: string, bookId: string, index: number): Promise<Chapter> {
+    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`);
+}
+
+export function createChapter(clubSlug: string, bookId: string, data: { index: number; title: string; content: string }): Promise<Chapter> {
+    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookId}/chapters`, {
+        method: 'POST',
+        body: JSON.stringify(data)
+    });
+}
+
+export function updateChapter(clubSlug: string, bookId: string, index: number, data: { index?: number; title?: string; content?: string }): Promise<Chapter> {
+    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`, {
+        method: 'PATCH',
+        body: JSON.stringify(data)
+    });
+}
+
+export function deleteChapter(clubSlug: string, bookId: string, index: number): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`, {
+        method: 'DELETE'
+    });
+}
+
+// --- PROGRESSION ---
+export function getProgression(clubSlug: string, bookId: string): Promise<Progression | null> {
+    return apiRequest<Progression | null>(`/clubs/${clubSlug}/books/${bookId}/progression`).catch(() => null);
+}
+
+export function updateProgression(clubSlug: string, bookId: string, currentPage: number): Promise<Progression> {
+    return apiRequest<Progression>(`/clubs/${clubSlug}/books/${bookId}/progression`, {
+        method: 'PATCH',
+        body: JSON.stringify({ currentPage })
+    });
+}
+
+export function getGlobalProgressions(clubSlug: string, bookId: string): Promise<MemberProgression[]> {
+    return apiRequest<MemberProgression[]>(`/clubs/${clubSlug}/books/${bookId}/progressions`).catch(() => []);
+}
+
+// --- REVIEWS ---
+export function getReviews(clubSlug: string, bookId: string): Promise<Review[]> {
+    return apiRequest<Review[]>(`/clubs/${clubSlug}/books/${bookId}/reviews`);
+}
+
+export function createReview(clubSlug: string, bookId: string, rating: number, comment?: string): Promise<Review> {
+    return apiRequest<Review>(`/clubs/${clubSlug}/books/${bookId}/reviews`, {
+        method: 'POST',
+        body: JSON.stringify({ rating, comment })
+    });
+}

@@ -1,0 +1,187 @@
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { getClubs, createClub, type Club } from '../../api';
+    import ClubCard from './ClubCard.svelte';
+
+    let { onSelectClub } = $props<{
+        onSelectClub: (club: Club) => void;
+    }>();
+
+    let clubs = $state<Club[]>([]);
+    let loading = $state(true);
+    let error = $state<string | null>(null);
+
+    // Filter state
+    let searchQuery = $state('');
+    const filteredClubs = $derived(
+        clubs.filter(club => club.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    // Modal creation state
+    let showCreateModal = $state(false);
+    let newClubName = $state('');
+    let newClubSlug = $state('');
+    let creating = $state(false);
+    let createError = $state<string | null>(null);
+
+    async function loadClubs() {
+        loading = true;
+        error = null;
+        try {
+            clubs = await getClubs();
+        } catch (e: any) {
+            error = e.message || 'Impossible de charger les grimoires de l\'alliance.';
+        } finally {
+            loading = false;
+        }
+    }
+
+    async function handleCreateClub(e: Event) {
+        e.preventDefault();
+        if (!newClubName.trim()) return;
+
+        creating = true;
+        createError = null;
+        try {
+            const created = await createClub(newClubName, newClubSlug || undefined);
+            clubs = [...clubs, created];
+            showCreateModal = false;
+            newClubName = '';
+            newClubSlug = '';
+        } catch (e: any) {
+            createError = e.message || 'Erreur lors de la création du club.';
+        } finally {
+            creating = false;
+        }
+    }
+
+    onMount(() => {
+        loadClubs();
+    });
+</script>
+
+<div class="w-full max-w-6xl mx-auto p-4 sm:p-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-secondary/20 pb-6">
+        <div>
+            <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">Les Grimoires de l'Alliance</h1>
+            <p class="text-gray-400 font-text text-sm sm:text-base">Rejoignez un ordre de lecture ou fondez votre propre cercle mystique.</p>
+        </div>
+
+        <button 
+            onclick={() => showCreateModal = true}
+            class="px-6 h-12 rounded-[var(--radius)] font-title text-[18px] uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-all duration-200 cursor-pointer hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] self-start md:self-auto"
+        >
+            Fonder un Cercle
+        </button>
+    </div>
+
+    <!-- Search bar -->
+    <div class="mb-8 w-full max-w-md">
+        <div class="relative">
+            <input 
+                type="text" 
+                placeholder="Rechercher un cercle de lecture..." 
+                bind:value={searchQuery}
+                class="w-full bg-primary text-black border border-foreground/30 focus:border-secondary rounded-[var(--radius)] font-text"
+            />
+            {#if searchQuery}
+                <button 
+                    onclick={() => searchQuery = ''}
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-black font-text text-sm"
+                >
+                    Effacer
+                </button>
+            {/if}
+        </div>
+    </div>
+
+    {#if loading}
+        <div class="flex flex-col items-center justify-center py-20">
+            <div class="w-12 h-12 rounded-full border-2 border-secondary border-t-transparent animate-spin mb-4"></div>
+            <p class="text-secondary font-title text-xl animate-pulse">Invocation des cercles en cours...</p>
+        </div>
+    {:else if error}
+        <div class="border border-Chronos/30 bg-Chronos/10 text-Chronos p-6 rounded-lg text-center max-w-md mx-auto my-10 font-text">
+            <p class="mb-4">{error}</p>
+            <button onclick={loadClubs} class="px-4 py-2 bg-Chronos text-white rounded font-title hover:bg-Chronos/85 transition-colors cursor-pointer">
+                Tenter à nouveau
+            </button>
+        </div>
+    {:else if filteredClubs.length === 0}
+        <div class="text-center py-16 border border-dashed border-gray-800 rounded-lg max-w-md mx-auto my-10 font-text text-gray-400">
+            <img src="/dragons_logos/normal/Aqua.svg" alt="" class="w-12 h-12 mx-auto mb-4 opacity-30" />
+            <p class="mb-2 text-lg">Aucun cercle de lecture trouvé</p>
+            <p class="text-sm text-gray-500">Essayez de modifier votre recherche ou fondez votre propre cercle.</p>
+        </div>
+    {:else}
+        <!-- Grid list of clubs -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {#each filteredClubs as club (club.id)}
+                <ClubCard {club} onSelect={onSelectClub} />
+            {/each}
+        </div>
+    {/if}
+</div>
+
+<!-- Modal Create Club -->
+{#if showCreateModal}
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-sm">
+        <div class="w-full max-w-md bg-background border border-secondary/40 p-6 sm:p-8 rounded-lg shadow-2xl relative">
+            <button 
+                onclick={() => showCreateModal = false}
+                class="absolute right-4 top-4 text-gray-400 hover:text-white text-xl cursor-pointer"
+            >
+                ✕
+            </button>
+
+            <h2 class="text-2xl font-title text-secondary mb-6 tracking-wider">Fonder un Nouveau Cercle</h2>
+            
+            <form onsubmit={handleCreateClub} class="space-y-6">
+                <div>
+                    <label for="club-name" class="block text-sm font-text text-gray-300 mb-2">Nom du Cercle</label>
+                    <input 
+                        type="text" 
+                        id="club-name" 
+                        placeholder="Ex: Le Cercle des Chroniqueurs" 
+                        bind:value={newClubName}
+                        required
+                        class="bg-primary text-black border border-foreground/30 focus:border-secondary"
+                    />
+                </div>
+
+                <div>
+                    <label for="club-slug" class="block text-sm font-text text-gray-300 mb-2">Slug URL (optionnel)</label>
+                    <input 
+                        type="text" 
+                        id="club-slug" 
+                        placeholder="Ex: le-cercle-des-chroniqueurs" 
+                        bind:value={newClubSlug}
+                        class="bg-primary text-black border border-foreground/30 focus:border-secondary"
+                    />
+                    <p class="text-[10px] text-gray-400 font-text mt-1">Laissé vide, le slug sera généré automatiquement à partir du nom.</p>
+                </div>
+
+                {#if createError}
+                    <p class="text-sm text-Chronos font-text">{createError}</p>
+                {/if}
+
+                <div class="flex space-x-3 pt-2">
+                    <button 
+                        type="button"
+                        onclick={() => showCreateModal = false}
+                        class="w-1/2 h-12 rounded-[var(--radius)] font-title text-lg uppercase tracking-wider text-white border border-white/20 hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                        Annuler
+                    </button>
+                    <button 
+                        type="submit"
+                        disabled={creating}
+                        class="w-1/2 h-12 rounded-[var(--radius)] font-title text-lg uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                        {creating ? 'Création...' : 'Créer'}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{/if}
