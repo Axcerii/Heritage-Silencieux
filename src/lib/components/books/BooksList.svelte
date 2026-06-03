@@ -119,12 +119,14 @@
         </div>
 
         <div class="flex space-x-3 w-full sm:w-auto">
-            <button 
-                onclick={handleExportCsv}
-                class="flex-1 sm:flex-none px-4 h-10 border border-secondary/40 rounded-[var(--radius)] font-title text-[15px] uppercase tracking-wider text-secondary hover:bg-secondary/10 transition-colors cursor-pointer"
-            >
-                Exporter (CSV)
-            </button>
+            {#if userRole !== null || session.user.role === 'ADMIN'}
+                <button 
+                    onclick={handleExportCsv}
+                    class="flex-1 sm:flex-none px-4 h-10 border border-secondary/40 rounded-[var(--radius)] font-title text-[15px] uppercase tracking-wider text-secondary hover:bg-secondary/10 transition-colors cursor-pointer"
+                >
+                    Exporter (CSV)
+                </button>
+            {/if}
             {#if canManageBooks}
                 <button 
                     onclick={() => showAddModal = true}

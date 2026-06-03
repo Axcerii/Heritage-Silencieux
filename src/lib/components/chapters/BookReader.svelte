@@ -2,13 +2,14 @@
     import { onMount } from 'svelte';
     import { getChapter, updateProgression, type Chapter } from '../../api';
 
-    let { clubSlug, bookId, initialChapter, chapters, bookPages, onBack } = $props<{
+    let { clubSlug, bookId, initialChapter, chapters, bookPages, onBack, onNavigateChapter } = $props<{
         clubSlug: string;
         bookId: string;
         initialChapter: Chapter;
         chapters: Chapter[];
         bookPages: number;
         onBack: () => void;
+        onNavigateChapter?: (chapter: Chapter) => void;
     }>();
 
     let currentChapter = $state<Chapter>(initialChapter);
@@ -29,23 +30,29 @@
     const nextChapter = $derived(currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null);
 
     async function loadChapter(chapter: Chapter) {
-        loading = true;
-        error = null;
-        try {
-            // Fetch fresh content if needed
-            currentChapter = await getChapter(clubSlug, bookId, chapter.index);
-            // Scroll reader container to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch (e: any) {
-            error = e.message || 'Impossible de charger le contenu de ce chapitre.';
-        } finally {
-            loading = false;
+        if (onNavigateChapter) {
+            onNavigateChapter(chapter);
+        } else {
+            loading = true;
+            error = null;
+            try {
+                // Fetch fresh content if needed
+                currentChapter = await getChapter(clubSlug, bookId, chapter.index);
+                // Scroll reader container to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (e: any) {
+                error = e.message || 'Impossible de charger le contenu de ce chapitre.';
+            } finally {
+                loading = false;
+            }
         }
     }
 
     onMount(() => {
-        // Initial fetch
-        loadChapter(initialChapter);
+        // Initial fetch if no parent navigation callback is managing it
+        if (!onNavigateChapter) {
+            loadChapter(initialChapter);
+        }
     });
 </script>
 

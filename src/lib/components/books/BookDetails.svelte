@@ -3,7 +3,7 @@
     import { 
         getChapters, createChapter, 
         getProgression, updateProgression, getGlobalProgressions,
-        getReviews, createReview, 
+        getReviews, createReview, deleteReviewAdmin,
         type Book, type Chapter, type Review, type Progression, type MemberProgression 
     } from '../../api';
     import type { AuthSession } from '../../auth-client';
@@ -151,6 +151,16 @@
             reviewError = e.message || 'Erreur lors de la soumission de la critique.';
         } finally {
             submittingReview = false;
+        }
+    }
+
+    async function handleDeleteReviewAdmin(reviewId: string) {
+        if (!confirm('Voulez-vous vraiment supprimer cette critique au titre de la modération ?')) return;
+        try {
+            await deleteReviewAdmin(reviewId);
+            reviews = reviews.filter(r => r.id !== reviewId);
+        } catch (e: any) {
+            alert('Erreur lors de la suppression: ' + e.message);
         }
     }
 
@@ -361,6 +371,16 @@
                                     <p class="text-sm text-gray-300 leading-relaxed font-text italic">
                                         « {review.comment} »
                                     </p>
+                                {/if}
+                                {#if session.user.role === 'ADMIN'}
+                                    <div class="pt-2 flex justify-end">
+                                        <button 
+                                            onclick={() => handleDeleteReviewAdmin(review.id)}
+                                            class="text-xs text-Chronos hover:underline bg-transparent border-0 cursor-pointer"
+                                        >
+                                            Supprimer (Modération)
+                                        </button>
+                                    </div>
                                 {/if}
                             </div>
                         {/each}

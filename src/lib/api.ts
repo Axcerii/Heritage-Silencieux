@@ -237,6 +237,16 @@ export function getGlobalProgressions(clubSlug: string, bookId: string): Promise
     return apiRequest<MemberProgression[]>(`/clubs/${clubSlug}/books/${bookId}/progressions`).catch(() => []);
 }
 
+export interface AdminUser {
+    id: string;
+    email: string;
+    name: string | null;
+    role: 'ADMIN' | 'USER';
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
 // --- REVIEWS ---
 export function getReviews(clubSlug: string, bookId: string): Promise<Review[]> {
     return apiRequest<Review[]>(`/clubs/${clubSlug}/books/${bookId}/reviews`);
@@ -248,3 +258,27 @@ export function createReview(clubSlug: string, bookId: string, rating: number, c
         body: JSON.stringify({ rating, comment })
     });
 }
+
+// --- ADMINISTRATION ---
+export function getAdminUsers(): Promise<AdminUser[]> {
+    return apiRequest<AdminUser[]>('/admin/users');
+}
+
+export function deactivateUser(userId: string): Promise<any> {
+    return apiRequest<any>(`/admin/users/${userId}/deactivate`, {
+        method: 'POST'
+    });
+}
+
+export function reactivateUser(userId: string): Promise<any> {
+    return apiRequest<any>(`/admin/users/${userId}/reactivate`, {
+        method: 'POST'
+    });
+}
+
+export function deleteReviewAdmin(reviewId: string): Promise<any> {
+    return apiRequest<any>(`/admin/reviews/${reviewId}`, {
+        method: 'DELETE'
+    });
+}
+

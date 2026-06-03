@@ -68,8 +68,7 @@
         </p>
     </div>
 
-    <div class="mt-4 pt-4 border-t border-gray-800/50 flex items-center justify-between">
-        <span class="text-xs text-gray-400 font-text">Clan d'alliance: <strong class="{theme.color}">{theme.name}</strong></span>
+    <div class="mt-4 pt-4 border-t border-gray-800/50 flex items-center justify-end">
         <span class="text-xs {theme.color} font-title tracking-wider group-hover:translate-x-1 transition-transform duration-200">Entrer →</span>
     </div>
 </button>
