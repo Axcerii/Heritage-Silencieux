@@ -28,7 +28,8 @@
             }
 
             book = await getBookDetails(data.clubSlug, data.bookId);
-            chapters = await getChapters(data.clubSlug, data.bookId);
+            const chaptersResponse = await getChapters(data.clubSlug, data.bookId);
+            chapters = chaptersResponse.data;
             activeChapter = await getChapter(data.clubSlug, data.bookId, data.chapterIndex);
         } catch (e: any) {
             error = e.message || "Erreur lors du chargement du grimoire.";

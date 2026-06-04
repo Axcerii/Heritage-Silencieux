@@ -7,6 +7,7 @@
         type Book, type Chapter, type Review, type Progression, type MemberProgression 
     } from '../../api';
     import type { AuthSession } from '../../auth-client';
+    import Cta from '../Cta.svelte';
 
     let { clubSlug, book, userRole, session, onBack, onReadChapter } = $props<{
         clubSlug: string;
@@ -56,7 +57,8 @@
     async function loadData() {
         // Chapters
         try {
-            chapters = await getChapters(clubSlug, book.id);
+            const response = await getChapters(clubSlug, book.id);
+            chapters = response.data;
             // Default next chapter index
             if (chapters.length > 0) {
                 newChapterIndex = Math.max(...chapters.map(c => c.index)) + 1;
@@ -235,13 +237,14 @@
                         class="w-20 bg-primary text-black text-center h-8 font-title"
                     />
                     <span class="text-sm text-gray-400">sur {book.pages}</span>
-                    <button 
-                        onclick={handleUpdateProgression}
+                    <Cta 
                         disabled={savingProgression}
-                        class="px-4 py-1 rounded bg-secondary hover:bg-secondary/90 text-black font-title text-xs uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                        {savingProgression ? 'Enregistrement...' : 'Mettre à jour'}
-                    </button>
+                        onClick={handleUpdateProgression}
+                        text={savingProgression ? 'Enregistrement...' : 'Mettre à jour'}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-8 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
+                    />
                 </div>
                 <div class="text-sm text-secondary font-title font-bold">
                     {progressPercentage}% Complété
@@ -261,12 +264,13 @@
             <div class="flex justify-between items-center border-b border-gray-850 pb-3">
                 <h3 class="text-xl font-title text-secondary tracking-wider">Chapitres</h3>
                 {#if canManageChapters}
-                    <button 
-                        onclick={() => showAddChapterModal = true}
-                        class="px-3 py-1 border border-secondary/40 rounded text-secondary font-title text-xs uppercase tracking-wider hover:bg-secondary/10 transition-colors cursor-pointer"
-                    >
-                        Écrire un Chapitre
-                    </button>
+                    <Cta 
+                        text="Écrire un Chapitre"
+                        onClick={() => showAddChapterModal = true}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
+                    />
                 {/if}
             </div>
 
@@ -287,12 +291,13 @@
                                 <span class="text-xs text-secondary font-title tracking-wider mr-3">INDEX {chapter.index}</span>
                                 <span class="text-sm text-gray-200 group-hover:text-secondary transition-colors font-semibold">{chapter.title}</span>
                             </div>
-                            <button 
-                                onclick={() => onReadChapter(chapter)}
-                                class="px-3 py-1 rounded-[var(--radius)] font-title text-xs uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer"
-                            >
-                                Lire
-                            </button>
+                            <Cta 
+                                text="Lire"
+                                onClick={() => onReadChapter(chapter)}
+                                dragon="Pura"
+                                border="Pura"
+                                class="h-8 w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
+                            />
                         </div>
                     {/each}
                 </div>
@@ -336,13 +341,14 @@
                         <p class="text-xs text-Chronos font-text">{reviewError}</p>
                     {/if}
 
-                    <button 
+                    <Cta 
                         type="submit" 
                         disabled={submittingReview}
-                        class="px-4 py-2 bg-secondary text-black font-title text-xs uppercase tracking-wider rounded transition-colors disabled:opacity-50 cursor-pointer"
-                    >
-                        {submittingReview ? 'Envoi...' : 'Publier la critique'}
-                    </button>
+                        text={submittingReview ? 'Envoi...' : 'Publier la critique'}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-10 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
+                    />
                 </form>
 
                 <!-- Reviews list -->
@@ -479,20 +485,21 @@
                 {/if}
 
                 <div class="flex space-x-3 pt-4">
-                    <button 
-                        type="button"
-                        onclick={() => showAddChapterModal = false}
-                        class="w-1/2 h-10 rounded-[var(--radius)] font-title text-sm uppercase tracking-wider text-white border border-white/20 hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        Annuler
-                    </button>
-                    <button 
+                    <Cta 
+                        text="Annuler"
+                        onClick={() => showAddChapterModal = false}
+                        dragon="none"
+                        border="none"
+                        class="w-1/2 h-10 font-title text-sm uppercase tracking-wider text-white border border-white/20 hover:bg-white/5"
+                    />
+                    <Cta 
                         type="submit"
                         disabled={addingChapter}
-                        class="w-1/2 h-10 rounded-[var(--radius)] font-title text-sm uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                        {addingChapter ? 'Création...' : 'Graver le chapitre'}
-                    </button>
+                        text={addingChapter ? 'Création...' : 'Graver le chapitre'}
+                        dragon="Pura"
+                        border="Pura"
+                        class="w-1/2 h-10 font-title text-sm uppercase tracking-wider !text-black"
+                    />
                 </div>
             </form>
         </div>

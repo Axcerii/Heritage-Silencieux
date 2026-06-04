@@ -193,8 +193,18 @@ export function exportLibraryCsv(clubSlug: string): Promise<string> {
 }
 
 // --- CHAPTERS ---
-export function getChapters(clubSlug: string, bookId: string): Promise<Chapter[]> {
-    return apiRequest<Chapter[]>(`/clubs/${clubSlug}/books/${bookId}/chapters`);
+export interface ChaptersResponse {
+    data: Chapter[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    };
+}
+
+export function getChapters(clubSlug: string, bookId: string): Promise<ChaptersResponse> {
+    return apiRequest<ChaptersResponse>(`/clubs/${clubSlug}/books/${bookId}/chapters`);
 }
 
 export function getChapter(clubSlug: string, bookId: string, index: number): Promise<Chapter> {

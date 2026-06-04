@@ -1,6 +1,7 @@
 <script lang="ts">
     import { signInEmail, signUpEmail, signInGoogle } from '../../auth-client';
     import { fade } from 'svelte/transition';
+    import Cta from '../Cta.svelte';
 
 
     let { onSuccess = () => {} } = $props();
@@ -153,17 +154,19 @@
                             {/if}
                         </div>
 
-                        <button 
+                        <Cta 
                             type="submit" 
                             disabled={loading}
-                            class="w-full h-12 mt-6 rounded-[var(--radius)] font-title text-[20px] font-semibold uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-all duration-200 ease-in-out cursor-pointer hover:shadow-[0_0_15px_rgba(210,182,116,0.35)] disabled:opacity-50 flex items-center justify-center"
+                            dragon="Pura"
+                            border="Pura"
+                            class="w-full h-12 mt-6 font-title text-[20px] font-semibold uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.35)]"
                         >
                             {#if loading}
                                 <div class="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                             {:else}
                                 Prêter Serment
                             {/if}
-                        </button>
+                        </Cta>
                     </form>
 
                     <!-- Divider -->
@@ -174,15 +177,17 @@
                     </div>
 
                     <!-- Google OAuth Button -->
-                    <button 
+                    <Cta 
                         type="button" 
-                        onclick={handleGoogleLogin} 
+                        onClick={handleGoogleLogin} 
                         disabled={loading}
-                        class="w-full h-12 rounded-[var(--radius)] border border-secondary bg-transparent text-gray-100 font-text hover:bg-secondary/10 hover:text-secondary transition-all duration-200 flex items-center justify-center cursor-pointer disabled:opacity-50 gap-2"
+                        dragon="none"
+                        border="Pura"
+                        class="w-full h-12 text-gray-100 font-text hover:bg-secondary/10 hover:text-secondary gap-2"
                     >
                         <img src="/extern_logos/google.svg" alt="" class="w-5 h-5 shrink-0" />
                         <span>Continuer avec Google</span>
-                    </button>
+                    </Cta>
 
                     <!-- Switch Link -->
                     <button 
@@ -240,17 +245,19 @@
                             />
                         </div>
 
-                        <button 
+                        <Cta 
                             type="submit" 
                             disabled={loading}
-                            class="w-full h-12 mt-6 rounded-[var(--radius)] font-title text-[20px] font-semibold uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-all duration-200 ease-in-out cursor-pointer hover:shadow-[0_0_15px_rgba(210,182,116,0.35)] disabled:opacity-50 flex items-center justify-center"
+                            dragon="Pura"
+                            border="Pura"
+                            class="w-full h-12 mt-6 font-title text-[20px] font-semibold uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.35)]"
                         >
                             {#if loading}
                                 <div class="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                             {:else}
                                 Franchir le Seuil
                             {/if}
-                        </button>
+                        </Cta>
                     </form>
 
                     <!-- Divider -->
@@ -261,15 +268,17 @@
                     </div>
 
                     <!-- Google OAuth Button -->
-                    <button 
+                    <Cta 
                         type="button" 
-                        onclick={handleGoogleLogin} 
+                        onClick={handleGoogleLogin} 
                         disabled={loading}
-                        class="w-full h-12 rounded-[var(--radius)] border border-secondary bg-transparent text-gray-100 font-text hover:bg-secondary/10 hover:text-secondary transition-all duration-200 flex items-center justify-center cursor-pointer disabled:opacity-50 gap-2"
+                        dragon="none"
+                        border="Pura"
+                        class="w-full h-12 text-gray-100 font-text hover:bg-secondary/10 hover:text-secondary gap-2"
                     >
                         <img src="/extern_logos/google.svg" alt="" class="w-5 h-5 shrink-0" />
                         <span>Continuer avec Google</span>
-                    </button>
+                    </Cta>
 
                     <!-- Switch Link -->
                     <button 

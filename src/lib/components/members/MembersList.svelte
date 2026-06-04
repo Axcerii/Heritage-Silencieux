@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { getClubMembers, addClubMember, updateClubMemberRole, removeClubMember, type ClubMember } from '../../api';
     import type { AuthSession } from '../../auth-client';
+    import Cta from '../Cta.svelte';
 
     let { clubSlug, userRole, session } = $props<{
         clubSlug: string;
@@ -107,13 +108,14 @@
                     required
                     class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm flex-1"
                 />
-                <button 
+                <Cta 
                     type="submit" 
                     disabled={inviting}
-                    class="h-10 px-5 rounded-[var(--radius)] font-title text-xs uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors disabled:opacity-50 cursor-pointer shrink-0"
-                >
-                    {inviting ? 'Recrutement...' : 'Ajouter au cercle'}
-                </button>
+                    text={inviting ? 'Recrutement...' : 'Ajouter au cercle'}
+                    dragon="Pura"
+                    border="Pura"
+                    class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-black shrink-0"
+                />
             </div>
 
             {#if inviteError}

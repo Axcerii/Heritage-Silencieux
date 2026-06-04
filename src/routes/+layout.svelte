@@ -1,5 +1,6 @@
 <script lang="ts">
     import '../globals.css';
+    import Cta from '$lib/components/Cta.svelte';
     import favicon from '$lib/assets/favicon.svg';
     import AuthPage from '$lib/components/auth/AuthPage.svelte';
     import { signOut, type AuthSession } from '$lib/auth-client';
@@ -93,12 +94,13 @@
                     </div>
                 </div>
 
-                <button 
-                    onclick={handleLogout}
-                    class="w-full px-4 h-10 rounded-[var(--radius)] font-title text-sm uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer"
-                >
-                    Quitter l'Héritage
-                </button>
+                <Cta 
+                    text="Quitter l'Héritage"
+                    onClick={handleLogout}
+                    dragon="Chronos"
+                    border="Chronos"
+                    class="h-10 text-sm font-title uppercase tracking-wider text-white"
+                />
             </div>
         </aside>
 

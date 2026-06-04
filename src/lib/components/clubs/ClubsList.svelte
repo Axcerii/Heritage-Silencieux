@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { getClubs, createClub, type Club } from '../../api';
     import ClubCard from './ClubCard.svelte';
+    import Cta from '../Cta.svelte';
 
     let { onSelectClub } = $props<{
         onSelectClub: (club: Club) => void;
@@ -67,12 +68,13 @@
             <p class="text-gray-400 font-text text-sm sm:text-base">Rejoignez un ordre de lecture ou fondez votre propre cercle mystique.</p>
         </div>
 
-        <button 
-            onclick={() => showCreateModal = true}
-            class="px-6 h-12 rounded-[var(--radius)] font-title text-[18px] uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-all duration-200 cursor-pointer hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] self-start md:self-auto"
-        >
-            Fonder un Cercle
-        </button>
+        <Cta 
+            text="Fonder un Cercle"
+            onClick={() => showCreateModal = true}
+            dragon="Pura"
+            border="Pura"
+            class="!w-auto px-6 font-title text-[18px] uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] self-start md:self-auto"
+        />
     </div>
 
     <!-- Search bar -->
@@ -166,20 +168,21 @@
                 {/if}
 
                 <div class="flex space-x-3 pt-2">
-                    <button 
-                        type="button"
-                        onclick={() => showCreateModal = false}
-                        class="w-1/2 h-12 rounded-[var(--radius)] font-title text-lg uppercase tracking-wider text-white border border-white/20 hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        Annuler
-                    </button>
-                    <button 
+                    <Cta 
+                        text="Annuler"
+                        onClick={() => showCreateModal = false}
+                        dragon="none"
+                        border="none"
+                        class="w-1/2 font-title text-lg uppercase tracking-wider text-white border border-white/20 hover:bg-white/5"
+                    />
+                    <Cta 
                         type="submit"
                         disabled={creating}
-                        class="w-1/2 h-12 rounded-[var(--radius)] font-title text-lg uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                        {creating ? 'Création...' : 'Créer'}
-                    </button>
+                        text={creating ? 'Création...' : 'Créer'}
+                        dragon="Pura"
+                        border="Pura"
+                        class="w-1/2 font-title text-lg uppercase tracking-wider !text-black"
+                    />
                 </div>
             </form>
         </div>

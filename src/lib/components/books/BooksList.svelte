@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { getBooks, createBook, exportLibraryCsv, type Book } from '../../api';
     import type { AuthSession } from '../../auth-client';
+    import Cta from '../Cta.svelte';
 
     let { clubSlug, userRole, session, onSelectBook } = $props<{
         clubSlug: string;
@@ -118,22 +119,24 @@
             <p class="text-sm text-gray-400 font-text">Consultez, lisez et évaluez les manuscrits partagés.</p>
         </div>
 
-        <div class="flex space-x-3 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
             {#if userRole !== null || session.user.role === 'ADMIN'}
-                <button 
-                    onclick={handleExportCsv}
-                    class="flex-1 sm:flex-none px-4 h-10 border border-secondary/40 rounded-[var(--radius)] font-title text-[15px] uppercase tracking-wider text-secondary hover:bg-secondary/10 transition-colors cursor-pointer"
-                >
-                    Exporter (CSV)
-                </button>
+                <Cta 
+                    text="Exporter (CSV)"
+                    onClick={handleExportCsv}
+                    dragon="Aqua"
+                    border="Aqua"
+                    class="h-10 px-4 font-title text-[15px] uppercase tracking-wider text-white sm:w-auto"
+                />
             {/if}
             {#if canManageBooks}
-                <button 
-                    onclick={() => showAddModal = true}
-                    class="flex-1 sm:flex-none px-4 h-10 rounded-[var(--radius)] font-title text-[15px] uppercase tracking-wider text-black bg-secondary hover:bg-secondary/95 transition-colors cursor-pointer"
-                >
-                    Ajouter un Livre
-                </button>
+                <Cta 
+                    text="Ajouter un Livre"
+                    onClick={() => showAddModal = true}
+                    dragon="Pura"
+                    border="Pura"
+                    class="h-10 px-4 font-title text-[15px] uppercase tracking-wider !text-black sm:w-auto"
+                />
             {/if}
         </div>
     </div>
@@ -287,20 +290,21 @@
                 {/if}
 
                 <div class="flex space-x-3 pt-4">
-                    <button 
-                        type="button"
-                        onclick={() => showAddModal = false}
-                        class="w-1/2 h-10 rounded-[var(--radius)] font-title text-sm uppercase tracking-wider text-white border border-white/20 hover:bg-white/5 transition-colors cursor-pointer"
-                    >
-                        Annuler
-                    </button>
-                    <button 
+                    <Cta 
+                        text="Annuler"
+                        onClick={() => showAddModal = false}
+                        dragon="none"
+                        border="none"
+                        class="w-1/2 h-10 font-title text-sm uppercase tracking-wider text-white border border-white/20 hover:bg-white/5"
+                    />
+                    <Cta 
                         type="submit"
                         disabled={adding}
-                        class="w-1/2 h-10 rounded-[var(--radius)] font-title text-sm uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                        {adding ? 'Ajout...' : 'Ajouter'}
-                    </button>
+                        text={adding ? 'Ajout...' : 'Ajouter'}
+                        dragon="Pura"
+                        border="Pura"
+                        class="w-1/2 h-10 font-title text-sm uppercase tracking-wider !text-black"
+                    />
                 </div>
             </form>
         </div>
