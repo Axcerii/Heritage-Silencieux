@@ -1,4 +1,5 @@
-const BACKEND_BASE = 'http://localhost:3000';
+export const BACKEND_BASE = 'http://localhost:3000';
+
 
 export interface Club {
     id: string;
@@ -41,6 +42,7 @@ export interface Chapter {
     bookId: string;
     createdAt: string;
     updatedAt: string;
+    isRead?: boolean;
 }
 
 export interface Review {
@@ -168,7 +170,7 @@ export function getBookDetails(clubSlug: string, bookId: string): Promise<Book> 
     return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`);
 }
 
-export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages: number }): Promise<Book> {
+export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages?: number }): Promise<Book> {
     return apiRequest<Book>(`/clubs/${clubSlug}/books`, {
         method: 'POST',
         body: JSON.stringify(data)
@@ -228,6 +230,13 @@ export function updateChapter(clubSlug: string, bookId: string, index: number, d
 export function deleteChapter(clubSlug: string, bookId: string, index: number): Promise<any> {
     return apiRequest<any>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`, {
         method: 'DELETE'
+    });
+}
+
+export function toggleChapterRead(clubSlug: string, bookId: string, index: number, read: boolean): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}/read`, {
+        method: 'PATCH',
+        body: JSON.stringify({ read })
     });
 }
 

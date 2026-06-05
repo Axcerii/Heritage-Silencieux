@@ -71,23 +71,11 @@
         </a>
     </div>
 {:else}
-    <header class="bg-background/40 backdrop-blur-sm border-b border-gray-800 px-6 py-4 flex items-center justify-between font-bold z-10">
-        <div class="flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold">
-            <a href="/" class="hover:text-white transition-colors">Cercles</a>
-            <span>/</span>
-            <a href="/clubs/{club.slug}" class="hover:text-white transition-colors truncate max-w-[150px]">{club.name}</a>
-            <span>/</span>
-            <a href="/clubs/{club.slug}/books/{book.id}" class="hover:text-white transition-colors truncate max-w-[150px]">{book.title}</a>
-            <span>/</span>
-            <span class="text-secondary font-title truncate max-w-[150px]">Chapitre {activeChapter.index}</span>
-        </div>
-        <span class="text-[10px] tracking-widest text-gray-500 font-text uppercase font-bold">Lecture</span>
-    </header>
-
-    <main class="py-6 flex-1 flex flex-col justify-center">
+    <main class="py-2 flex-1 flex flex-col justify-center">
         <BookReader 
             clubSlug={data.clubSlug}
             bookId={data.bookId}
+            bookTitle={book.title}
             initialChapter={activeChapter}
             {chapters}
             bookPages={book.pages}

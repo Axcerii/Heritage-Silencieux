@@ -37,7 +37,6 @@
     let newBookTitle = $state('');
     let newBookAuthor = $state('');
     let newBookGenre = $state('');
-    let newBookPages = $state<number>(100);
     let adding = $state(false);
     let addError = $state<string | null>(null);
 
@@ -60,7 +59,7 @@
 
     async function handleCreateBook(e: Event) {
         e.preventDefault();
-        if (!newBookTitle.trim() || !newBookAuthor.trim() || !newBookGenre.trim() || newBookPages <= 0) return;
+        if (!newBookTitle.trim() || !newBookAuthor.trim() || !newBookGenre.trim()) return;
 
         adding = true;
         addError = null;
@@ -68,15 +67,13 @@
             const created = await createBook(clubSlug, {
                 title: newBookTitle,
                 author: newBookAuthor,
-                genre: newBookGenre,
-                pages: newBookPages
+                genre: newBookGenre
             });
             books = [created, ...books];
             showAddModal = false;
             newBookTitle = '';
             newBookAuthor = '';
             newBookGenre = '';
-            newBookPages = 100;
         } catch (e: any) {
             addError = e.message || 'Erreur lors de la création du livre.';
         } finally {
@@ -198,7 +195,6 @@
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-secondary/15 text-secondary">{book.genre}</span>
-                            <span class="text-xs text-gray-400 font-text">{book.pages} pages</span>
                         </div>
                         <h3 class="text-xl font-title text-white group-hover:text-secondary transition-colors leading-snug line-clamp-1">{book.title}</h3>
                         <p class="text-sm text-gray-400 font-text italic mt-1 mb-4">par {book.author}</p>
@@ -260,7 +256,7 @@
                     />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1">
                     <div>
                         <label for="book-genre" class="block text-xs font-text text-gray-300 mb-1">Genre</label>
                         <input 
@@ -269,18 +265,7 @@
                             placeholder="Ex: Aventure" 
                             bind:value={newBookGenre}
                             required
-                            class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm"
-                        />
-                    </div>
-                    <div>
-                        <label for="book-pages" class="block text-xs font-text text-gray-300 mb-1">Nombre de Pages</label>
-                        <input 
-                            type="number" 
-                            id="book-pages" 
-                            bind:value={newBookPages}
-                            min="1"
-                            required
-                            class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm"
+                            class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm w-full"
                         />
                     </div>
                 </div>
