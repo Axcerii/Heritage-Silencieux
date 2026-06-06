@@ -71,8 +71,8 @@
         <Cta 
             text="Fonder un Cercle"
             onClick={() => showCreateModal = true}
-            dragon="Pura"
-            border="Pura"
+            dragon="Artrish"
+            border="Yinva"
             class="!w-auto px-6 font-title text-[18px] uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] self-start md:self-auto"
         />
     </div>

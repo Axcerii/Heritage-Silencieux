@@ -39,11 +39,13 @@
     class={buttonClass}
 >
     {#if dragon && dragon !== 'none'}
-        <img src="/dragons_logos/normal/{dragon}.svg" alt="" class="absolute right-[20%] top-0 h-full w-auto opacity-30 pointer-events-none" />
+        <img src="/dragons_logos/normal/{dragon}.svg" alt="" class="absolute right-[20%] top-0 h-full w-auto opacity-20 pointer-events-none z-0" />
     {/if}
-    {#if children}
-        {@render children()}
-    {:else}
-        {text}
-    {/if}
+    <span class="relative z-10 pointer-events-none">
+        {#if children}
+            {@render children()}
+        {:else}
+            {text}
+        {/if}
+    </span>
 </button>
