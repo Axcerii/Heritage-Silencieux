@@ -4,6 +4,7 @@
     import { getClubs, getBookDetails, getClubMembers, type Club, type Book, type Chapter } from '$lib/api';
     import type { AuthSession } from '$lib/auth-client';
     import BookDetails from '$lib/components/books/BookDetails.svelte';
+    import { breadcrumbs } from '$lib/breadcrumbs.svelte';
 
     let { data } = $props<{
         data: { clubSlug: string; bookId: string; session: AuthSession };
@@ -14,6 +15,17 @@
     let userRole = $state<'OWNER' | 'EDITOR' | 'READER' | null>(null);
     let loading = $state(true);
     let error = $state<string | null>(null);
+
+    // Register breadcrumbs when club and book load
+    $effect(() => {
+        if (club && book) {
+            breadcrumbs.set([
+                { label: 'Cercles', href: '/' },
+                { label: club.name, href: `/clubs/${club.slug}` },
+                { label: book.title }
+            ]);
+        }
+    });
 
     async function loadBookData() {
         loading = true;
@@ -70,16 +82,6 @@
         </a>
     </div>
 {:else}
-    <header class="bg-background/40 backdrop-blur-sm border-b border-gray-800 px-6 py-4 flex items-center justify-between font-bold z-10">
-        <div class="flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold">
-            <a href="/" class="hover:text-white transition-colors">Cercles</a>
-            <span>/</span>
-            <a href="/clubs/{club.slug}" class="hover:text-white transition-colors truncate max-w-[150px]">{club.name}</a>
-            <span>/</span>
-            <span class="text-secondary font-title truncate max-w-[150px]">{book.title}</span>
-        </div>
-        <span class="text-[10px] tracking-widest text-gray-500 font-text uppercase font-bold">Initié Connecté</span>
-    </header>
 
     <main class="py-6 flex-1 flex flex-col justify-center">
         <BookDetails 

@@ -5,6 +5,7 @@
     import type { AuthSession } from '$lib/auth-client';
     import BooksList from '$lib/components/books/BooksList.svelte';
     import MembersList from '$lib/components/members/MembersList.svelte';
+    import { breadcrumbs } from '$lib/breadcrumbs.svelte';
 
     let { data } = $props<{
         data: { clubSlug: string; session: AuthSession };
@@ -14,6 +15,16 @@
     let userRole = $state<'OWNER' | 'EDITOR' | 'READER' | null>(null);
     let loading = $state(true);
     let error = $state<string | null>(null);
+
+    // Register breadcrumbs when club loads
+    $effect(() => {
+        if (club) {
+            breadcrumbs.set([
+                { label: 'Cercles', href: '/' },
+                { label: club.name }
+            ]);
+        }
+    });
 
     let activeClubTab = $state<'library' | 'members'>('library');
 
@@ -66,14 +77,6 @@
         </a>
     </div>
 {:else}
-    <header class="bg-background/40 backdrop-blur-sm border-b border-gray-800 px-6 py-4 flex items-center justify-between font-bold z-10">
-        <div class="flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold">
-            <a href="/" class="hover:text-white transition-colors">Cercles</a>
-            <span>/</span>
-            <span class="text-secondary font-title">{club.name}</span>
-        </div>
-        <span class="text-[10px] tracking-widest text-gray-500 font-text uppercase font-bold">Initié Connecté</span>
-    </header>
 
     <main class="w-full max-w-6xl mx-auto p-4 sm:p-6 space-y-6 flex-1">
         <!-- Club Detail Header -->

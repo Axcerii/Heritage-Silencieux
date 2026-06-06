@@ -10,6 +10,7 @@
     import type { AuthSession } from '../../auth-client';
     import { goto } from '$app/navigation';
     import Cta from '../Cta.svelte';
+    import { getImageUrl } from '$lib';
 
     let { clubSlug, book = $bindable(), userRole, session, onBack, onReadChapter } = $props<{
         clubSlug: string;
@@ -440,7 +441,7 @@
                                     <div class="flex justify-between items-center">
                                         <div class="flex items-center space-x-2">
                                             {#if review.user.image}
-                                                <img src={review.user.image} alt="" class="w-6 h-6 rounded-full object-cover" />
+                                                <img src={getImageUrl(review.user.image)} alt="" class="w-6 h-6 rounded-full object-cover" />
                                             {:else}
                                                 <div class="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs">
                                                     {review.user.name?.charAt(0) || 'U'}

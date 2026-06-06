@@ -8,6 +8,7 @@
         type Club, type Book, type Chapter, BACKEND_BASE
     } from '$lib/api';
     import Cta from '$lib/components/Cta.svelte';
+    import { breadcrumbs } from '$lib/breadcrumbs.svelte';
     
     import 'easymde/dist/easymde.min.css';
 
@@ -18,6 +19,18 @@
     // Svelte 5 States
     let club = $state<Club | null>(null);
     let book = $state<Book | null>(null);
+
+    // Register breadcrumbs when club and book load
+    $effect(() => {
+        if (club && book) {
+            breadcrumbs.set([
+                { label: 'Cercles', href: '/' },
+                { label: club.name, href: `/clubs/${club.slug}` },
+                { label: book.title, href: `/clubs/${club.slug}/books/${book.id}` },
+                { label: isEditMode ? `Modifier le Chapitre ${editIndex}` : 'Nouveau Chapitre' }
+            ]);
+        }
+    });
     let chapters = $state<Chapter[]>([]);
     let targetChapter = $state<Chapter | null>(null);
     
@@ -216,21 +229,6 @@
         </a>
     </div>
 {:else}
-    <!-- Header/Breadcrumb -->
-    <header class="bg-background/40 backdrop-blur-sm border-b border-gray-800 px-6 py-4 flex items-center justify-between font-bold z-10 select-none">
-        <div class="flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold">
-            <a href="/" class="hover:text-white transition-colors">Cercles</a>
-            <span>/</span>
-            <a href="/clubs/{club.slug}" class="hover:text-white transition-colors truncate max-w-[150px]">{club.name}</a>
-            <span>/</span>
-            <a href="/clubs/{club.slug}/books/{book.id}" class="hover:text-white transition-colors truncate max-w-[150px]">{book.title}</a>
-            <span>/</span>
-            <span class="text-secondary font-title truncate max-w-[150px]">
-                {isEditMode ? `Modifier le Chapitre ${editIndex}` : 'Nouveau Chapitre'}
-            </span>
-        </div>
-        <span class="text-[10px] tracking-widest text-gray-500 font-text uppercase font-bold">Atelier d'Écriture</span>
-    </header>
 
     <main class="flex-1 p-4 sm:p-6 max-w-5xl w-full mx-auto space-y-6">
         <div class="flex justify-between items-center border-b border-gray-800 pb-4">

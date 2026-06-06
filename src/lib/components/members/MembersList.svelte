@@ -3,6 +3,7 @@
     import { getClubMembers, addClubMember, updateClubMemberRole, removeClubMember, type ClubMember } from '../../api';
     import type { AuthSession } from '../../auth-client';
     import Cta from '../Cta.svelte';
+    import { censorEmail, getImageUrl } from '$lib';
 
     let { clubSlug, userRole, session } = $props<{
         clubSlug: string;
@@ -153,7 +154,7 @@
                         <tr class="hover:bg-background/40 transition-colors">
                             <td class="p-4 flex items-center space-x-3">
                                 {#if member.user.image}
-                                    <img src={member.user.image} alt="" class="w-8 h-8 rounded-full object-cover" />
+                                    <img src={getImageUrl(member.user.image)} alt="" class="w-8 h-8 rounded-full object-cover" />
                                 {:else}
                                     <div class="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-bold text-sm">
                                         {member.user.name?.charAt(0) || 'U'}
@@ -161,7 +162,7 @@
                                 {/if}
                                 <span class="text-white font-semibold">{member.user.name || 'Utilisateur'}</span>
                             </td>
-                            <td class="p-4 text-gray-400 font-text">{member.user.email}</td>
+                            <td class="p-4 text-gray-400 font-text">{censorEmail(member.user.email)}</td>
                             <td class="p-4">
                                 {#if canManageMembers && member.userId !== session.user.id}
                                     <select 
