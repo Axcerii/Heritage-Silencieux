@@ -64,12 +64,12 @@
 <div class="w-full max-w-6xl mx-auto p-4 sm:p-6">
     <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-secondary/20 pb-6">
         <div>
-            <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">Les Grimoires de l'Alliance</h1>
-            <p class="text-gray-400 font-text text-sm sm:text-base">Rejoignez un ordre de lecture ou fondez votre propre cercle mystique.</p>
+            <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">La Bibliothèque</h1>
+            <p class="text-gray-400 font-text text-sm sm:text-base">Bienvenue dans la capitale du savoir d'Arthera : L'Héritage Silencieux</p>
         </div>
 
         <Cta 
-            text="Fonder un Cercle"
+            text="Ouvrir une bibliothèque"
             onClick={() => showCreateModal = true}
             dragon="Artrish"
             border="Yinva"
@@ -82,14 +82,14 @@
         <div class="relative">
             <input 
                 type="text" 
-                placeholder="Rechercher un cercle de lecture..." 
+                placeholder="Rechercher une bibliothèque..." 
                 bind:value={searchQuery}
-                class="w-full bg-primary text-black border border-foreground/30 focus:border-secondary rounded-[var(--radius)] font-text"
+                class="w-full bg-Lada! text-black border border-foreground/30 focus:border-secondary rounded-(--radius) font-text"
             />
             {#if searchQuery}
                 <button 
                     onclick={() => searchQuery = ''}
-                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-700 hover:text-black font-text text-sm"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-Artrish hover:text-black font-text text-sm bg-Pestia px-2 rounded border border-Artrish cursor-pointer"
                 >
                     Effacer
                 </button>
@@ -110,10 +110,10 @@
             </button>
         </div>
     {:else if filteredClubs.length === 0}
-        <div class="text-center py-16 border border-dashed border-gray-800 rounded-lg max-w-md mx-auto my-10 font-text text-gray-400">
-            <img src="/dragons_logos/normal/Aqua.svg" alt="" class="w-12 h-12 mx-auto mb-4 opacity-30" />
-            <p class="mb-2 text-lg">Aucun cercle de lecture trouvé</p>
-            <p class="text-sm text-gray-500">Essayez de modifier votre recherche ou fondez votre propre cercle.</p>
+        <div class="text-center p-16 border border-dashed border-gray-800 rounded-lg max-w-md mx-auto my-10 font-text text-Artrish">
+            <img src="/dragons_logos/normal/Shizari.svg" alt="" class="w-12 h-12 mx-auto mb-4 opacity-30 accent-svg" />
+            <p class="mb-2 text-lg">Aucune bibliothèque n'a été trouvée</p>
+            <p class="text-sm text-gray-500">Essayez de modifier votre recherche ou d'ouvrir votre propre bibliothèque.</p>
         </div>
     {:else}
         <!-- Grid list of clubs -->
@@ -136,15 +136,15 @@
                 ✕
             </button>
 
-            <h2 class="text-2xl font-title text-secondary mb-6 tracking-wider">Fonder un Nouveau Cercle</h2>
+            <h2 class="text-2xl font-title text-secondary mb-6 tracking-wider">Ouvrir une nouvelle bibliothèque</h2>
             
             <form onsubmit={handleCreateClub} class="space-y-6">
                 <div>
-                    <label for="club-name" class="block text-sm font-text text-gray-300 mb-2">Nom du Cercle</label>
+                    <label for="club-name" class="block text-sm font-text text-gray-300 mb-2">Nom de la bibliothèque</label>
                     <input 
                         type="text" 
                         id="club-name" 
-                        placeholder="Ex: Le Cercle des Chroniqueurs" 
+                        placeholder="Ex : Études sur les éternelles" 
                         bind:value={newClubName}
                         required
                         class="bg-primary text-black border border-foreground/30 focus:border-secondary"
@@ -156,11 +156,11 @@
                     <input 
                         type="text" 
                         id="club-slug" 
-                        placeholder="Ex: le-cercle-des-chroniqueurs" 
+                        placeholder="etudes-sur-les-éternelles" 
                         bind:value={newClubSlug}
                         class="bg-primary text-black border border-foreground/30 focus:border-secondary"
                     />
-                    <p class="text-[10px] text-gray-400 font-text mt-1">Laissé vide, le slug sera généré automatiquement à partir du nom.</p>
+                    <p class="text-sm text-Aqua font-text mt-1">* Si vide, il sera généré automatiquement à partir du nom.</p>
                 </div>
 
                 {#if createError}
@@ -179,8 +179,8 @@
                         type="submit"
                         disabled={creating}
                         text={creating ? 'Création...' : 'Créer'}
-                        dragon="Pura"
-                        border="Pura"
+                        dragon="Artrish"
+                        border="Yinva"
                         class="w-1/2 font-title text-lg uppercase tracking-wider !text-black"
                     />
                 </div>
