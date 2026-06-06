@@ -53,7 +53,14 @@
 
     <div>
         <div class="flex items-center justify-between mb-2">
-            <span class="text-xs uppercase tracking-widest text-gray-400 font-text">Sceau de l'Ordre</span>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs uppercase tracking-widest text-gray-400 font-text">Sceau de l'Ordre</span>
+                {#if club.isPublic}
+                    <span class="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-secondary/20 text-secondary border border-secondary/30">Public</span>
+                {:else}
+                    <span class="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-Pestia/20 text-Pestia border border-Pestia/30">Privé</span>
+                {/if}
+            </div>
             {#if !club.isActive}
                 <span class="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-Chronos/20 text-Chronos border border-Chronos/30">Inactif</span>
             {:else}

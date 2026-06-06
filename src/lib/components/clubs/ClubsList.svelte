@@ -22,6 +22,7 @@
     let showCreateModal = $state(false);
     let newClubName = $state('');
     let newClubSlug = $state('');
+    let newClubIsPublic = $state(true);
     let creating = $state(false);
     let createError = $state<string | null>(null);
 
@@ -44,11 +45,12 @@
         creating = true;
         createError = null;
         try {
-            const created = await createClub(newClubName, newClubSlug || undefined);
+            const created = await createClub(newClubName, newClubSlug || undefined, newClubIsPublic);
             clubs = [...clubs, created];
             showCreateModal = false;
             newClubName = '';
             newClubSlug = '';
+            newClubIsPublic = true;
         } catch (e: any) {
             createError = e.message || 'Erreur lors de la création du club.';
         } finally {
@@ -100,7 +102,7 @@
     {#if loading}
         <div class="flex flex-col items-center justify-center py-20">
             <div class="w-12 h-12 rounded-full border-2 border-secondary border-t-transparent animate-spin mb-4"></div>
-            <p class="text-secondary font-title text-xl animate-pulse">Invocation des cercles en cours...</p>
+            <p class="text-secondary font-title text-xl animate-pulse">Dépoussièrement des rayons en cours...</p>
         </div>
     {:else if error}
         <div class="border border-Chronos/30 bg-Chronos/10 text-Chronos p-6 rounded-lg text-center max-w-md mx-auto my-10 font-text">
@@ -161,6 +163,28 @@
                         class="bg-primary text-black border border-foreground/30 focus:border-secondary"
                     />
                     <p class="text-sm text-Aqua font-text mt-1">* Si vide, il sera généré automatiquement à partir du nom.</p>
+                </div>
+
+                <div>
+                    <span class="block text-sm font-text text-gray-300 mb-2">Type d'accès</span>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button 
+                            type="button"
+                            onclick={() => newClubIsPublic = true}
+                            class="p-4 rounded-lg border text-left transition-all cursor-pointer {newClubIsPublic ? 'bg-secondary/15 border-secondary text-secondary shadow-[0_0_15px_rgba(210,182,116,0.15)]' : 'bg-background/40 border-gray-800 text-gray-400 hover:border-gray-700'}"
+                        >
+                            <div class="font-title text-sm uppercase tracking-wider mb-1">Public</div>
+                            <div class="text-[11px] font-text leading-snug text-gray-400 {newClubIsPublic ? 'text-secondary/80' : ''}">Tout le monde peut accéder librement à cette bibliothèque.</div>
+                        </button>
+                        <button 
+                            type="button"
+                            onclick={() => newClubIsPublic = false}
+                            class="p-4 rounded-lg border text-left transition-all cursor-pointer {!newClubIsPublic ? 'bg-secondary/15 border-secondary text-secondary shadow-[0_0_15px_rgba(210,182,116,0.15)]' : 'bg-background/40 border-gray-800 text-gray-400 hover:border-gray-700'}"
+                        >
+                            <div class="font-title text-sm uppercase tracking-wider mb-1">Privé</div>
+                            <div class="text-[11px] font-text leading-snug text-gray-400 {!newClubIsPublic ? 'text-secondary/80' : ''}">Les membres doivent demander l'accès pour rejoindre.</div>
+                        </button>
+                    </div>
                 </div>
 
                 {#if createError}

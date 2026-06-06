@@ -41,7 +41,7 @@
     {#if dragon && dragon !== 'none'}
         <img src="/dragons_logos/normal/{dragon}.svg" alt="" class="absolute right-[20%] top-0 h-full w-auto opacity-20 pointer-events-none z-0" />
     {/if}
-    <span class="relative z-10 pointer-events-none">
+    <span class="relative z-10 pointer-events-none flex items-center justify-center gap-2">
         {#if children}
             {@render children()}
         {:else}

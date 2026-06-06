@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import { getClubs, getClubMembers, type Club, type Book } from '$lib/api';
+    import { getClubs, getJoinStatus, joinClub, type Club, type Book } from '$lib/api';
     import type { AuthSession } from '$lib/auth-client';
     import BooksList from '$lib/components/books/BooksList.svelte';
     import MembersList from '$lib/components/members/MembersList.svelte';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
+    import Cta from '$lib/components/Cta.svelte';
 
     let { data } = $props<{
         data: { clubSlug: string; session: AuthSession };
@@ -13,8 +14,12 @@
 
     let club = $state<Club | null>(null);
     let userRole = $state<'OWNER' | 'EDITOR' | 'READER' | null>(null);
+    let hasPendingRequest = $state(false);
     let loading = $state(true);
     let error = $state<string | null>(null);
+
+    let joining = $state(false);
+    let joinError = $state<string | null>(null);
 
     // Register breadcrumbs when club loads
     $effect(() => {
@@ -39,15 +44,36 @@
                 return;
             }
 
-            const members = await getClubMembers(data.clubSlug);
-            const myMember = members.find(m => m.userId === data.session.user.id);
-            if (myMember) {
-                userRole = myMember.role;
+            const status = await getJoinStatus(data.clubSlug);
+            if (status.isMember) {
+                userRole = status.role;
+            } else {
+                userRole = null;
+                hasPendingRequest = status.hasPendingRequest;
             }
         } catch (e: any) {
             error = e.message || "Erreur lors du chargement du cercle.";
         } finally {
             loading = false;
+        }
+    }
+
+    async function handleJoinClub() {
+        if (!club || joining) return;
+        joining = true;
+        joinError = null;
+        try {
+            const res = await joinClub(club.slug);
+            if (res.status === 'JOINED') {
+                userRole = 'READER';
+                hasPendingRequest = false;
+            } else if (res.status === 'PENDING') {
+                hasPendingRequest = true;
+            }
+        } catch (e: any) {
+            joinError = e.message || "Impossible de rejoindre le cercle.";
+        } finally {
+            joining = false;
         }
     }
 
@@ -96,36 +122,87 @@
             </div>
         </div>
 
-        <!-- Tabs Menu -->
-        <div class="flex border-b border-gray-800">
-            <button 
-                onclick={() => activeClubTab = 'library'}
-                class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
-            >
-                Bibliothèque
-            </button>
-            <button 
-                onclick={() => activeClubTab = 'members'}
-                class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'members' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
-            >
-                Membres
-            </button>
-        </div>
+        {#if userRole === null}
+            <div class="max-w-2xl mx-auto my-12 p-8 bg-background/40 backdrop-blur-md border border-secondary/30 rounded-lg text-center shadow-xl space-y-6">
+                <div class="w-16 h-16 bg-secondary/10 text-secondary border border-secondary/30 rounded-full flex items-center justify-center mx-auto text-3xl">
+                    {#if club.isPublic}🔓{:else}🔒{/if}
+                </div>
+                
+                <div class="space-y-2">
+                    <h2 class="text-2xl font-title text-secondary tracking-wider">
+                        {#if club.isPublic}Cercle de lecture Public{:else}Cercle de lecture Privé{/if}
+                    </h2>
+                    <p class="text-gray-400 font-text text-sm sm:text-base leading-relaxed">
+                        {#if club.isPublic}
+                            Ce cercle est public. Rejoignez la communauté des lecteurs pour accéder à sa bibliothèque, partager vos avis, et suivre votre progression.
+                        {:else}
+                            Ce cercle de lecture est privé. Vous devez envoyer une demande d'adhésion pour que le propriétaire valide votre entrée.
+                        {/if}
+                    </p>
+                </div>
 
-        <!-- Tab Contents -->
-        {#if activeClubTab === 'library'}
-            <BooksList 
-                clubSlug={club.slug} 
-                userRole={userRole} 
-                session={data.session} 
-                onSelectBook={handleSelectBook} 
-            />
+                {#if joinError}
+                    <p class="text-sm text-Chronos font-text bg-Chronos/10 border border-Chronos/20 p-3 rounded">{joinError}</p>
+                {/if}
+
+                <div class="pt-4 flex justify-center">
+                    {#if club.isPublic}
+                        <Cta 
+                            text={joining ? "Rejointement..." : "Rejoindre le cercle"}
+                            disabled={joining}
+                            onClick={handleJoinClub}
+                            dragon="Artrish"
+                            border="Yinva"
+                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
+                        />
+                    {:else if hasPendingRequest}
+                        <div class="px-6 py-3 border border-secondary/30 bg-secondary/10 text-secondary rounded-lg font-title uppercase tracking-widest text-sm animate-pulse">
+                            ⏳ Demande d'adhésion en attente
+                        </div>
+                    {:else}
+                        <Cta 
+                            text={joining ? "Envoi..." : "Demander à rejoindre"}
+                            disabled={joining}
+                            onClick={handleJoinClub}
+                            dragon="Artrish"
+                            border="Yinva"
+                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
+                        />
+                    {/if}
+                </div>
+            </div>
         {:else}
-            <MembersList 
-                clubSlug={club.slug} 
-                userRole={userRole} 
-                session={data.session} 
-            />
+            <!-- Tabs Menu -->
+            <div class="flex border-b border-gray-800">
+                <button 
+                    onclick={() => activeClubTab = 'library'}
+                    class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
+                >
+                    Bibliothèque
+                </button>
+                <button 
+                    onclick={() => activeClubTab = 'members'}
+                    class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'members' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
+                >
+                    Membres
+                </button>
+            </div>
+
+            <!-- Tab Contents -->
+            {#if activeClubTab === 'library'}
+                <BooksList 
+                    clubSlug={club.slug} 
+                    userRole={userRole} 
+                    session={data.session} 
+                    onSelectBook={handleSelectBook} 
+                />
+            {:else}
+                <MembersList 
+                    clubSlug={club.slug} 
+                    userRole={userRole} 
+                    session={data.session} 
+                />
+            {/if}
         {/if}
     </main>
 {/if}

@@ -6,6 +6,7 @@ export interface Club {
     name: string;
     slug: string;
     isActive: boolean;
+    isPublic: boolean;
 }
 
 export interface Book {
@@ -116,14 +117,14 @@ export function getClubDetails(clubId: string): Promise<Club> {
     return apiRequest<Club>(`/clubs/${clubId}`);
 }
 
-export function createClub(name: string, slug?: string): Promise<Club> {
+export function createClub(name: string, slug?: string, isPublic?: boolean): Promise<Club> {
     return apiRequest<Club>('/clubs', {
         method: 'POST',
-        body: JSON.stringify({ name, slug })
+        body: JSON.stringify({ name, slug, isPublic })
     });
 }
 
-export function updateClub(clubId: string, data: { name?: string; slug?: string; isActive?: boolean }): Promise<Club> {
+export function updateClub(clubId: string, data: { name?: string; slug?: string; isActive?: boolean; isPublic?: boolean }): Promise<Club> {
     return apiRequest<Club>(`/clubs/${clubId}`, {
         method: 'PATCH',
         body: JSON.stringify(data)
@@ -158,6 +159,33 @@ export function updateClubMemberRole(clubSlug: string, userId: string, role: 'OW
 export function removeClubMember(clubSlug: string, userId: string): Promise<any> {
     return apiRequest<any>(`/clubs/${clubSlug}/members/${userId}`, {
         method: 'DELETE'
+    });
+}
+
+// --- CLUB JOIN REQUESTS ---
+export function joinClub(clubSlug: string): Promise<{ status: 'JOINED' | 'PENDING'; membership?: ClubMember }> {
+    return apiRequest<{ status: 'JOINED' | 'PENDING'; membership?: ClubMember }>(`/clubs/${clubSlug}/join`, {
+        method: 'POST'
+    });
+}
+
+export function getJoinStatus(clubSlug: string): Promise<{ isMember: boolean; role: 'OWNER' | 'EDITOR' | 'READER' | null; hasPendingRequest: boolean }> {
+    return apiRequest<{ isMember: boolean; role: 'OWNER' | 'EDITOR' | 'READER' | null; hasPendingRequest: boolean }>(`/clubs/${clubSlug}/join-status`);
+}
+
+export function getJoinRequests(clubSlug: string): Promise<any[]> {
+    return apiRequest<any[]>(`/clubs/${clubSlug}/join-requests`);
+}
+
+export function approveJoinRequest(clubSlug: string, userId: string): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/join-requests/${userId}/approve`, {
+        method: 'POST'
+    });
+}
+
+export function rejectJoinRequest(clubSlug: string, userId: string): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/join-requests/${userId}/reject`, {
+        method: 'POST'
     });
 }
 

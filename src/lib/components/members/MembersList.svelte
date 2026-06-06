@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getClubMembers, addClubMember, updateClubMemberRole, removeClubMember, type ClubMember } from '../../api';
+    import { getClubMembers, addClubMember, updateClubMemberRole, removeClubMember, getJoinRequests, approveJoinRequest, rejectJoinRequest, type ClubMember } from '../../api';
     import type { AuthSession } from '../../auth-client';
     import Cta from '../Cta.svelte';
     import { censorEmail, getImageUrl } from '$lib';
@@ -26,15 +26,34 @@
         session.user.role === 'ADMIN' || userRole === 'OWNER'
     );
 
+    let joinRequests = $state<any[]>([]);
+    let requestsLoading = $state(false);
+    let requestsError = $state<string | null>(null);
+
     async function loadMembers() {
         loading = true;
         error = null;
         try {
             members = await getClubMembers(clubSlug);
+            if (canManageMembers) {
+                await loadJoinRequests();
+            }
         } catch (e: any) {
             error = e.message || 'Impossible de charger la liste des membres.';
         } finally {
             loading = false;
+        }
+    }
+
+    async function loadJoinRequests() {
+        requestsLoading = true;
+        requestsError = null;
+        try {
+            joinRequests = await getJoinRequests(clubSlug);
+        } catch (e: any) {
+            requestsError = e.message || "Impossible de charger les demandes d'adhésion.";
+        } finally {
+            requestsLoading = false;
         }
     }
 
@@ -55,6 +74,25 @@
             inviteError = e.message || 'Erreur lors de l\'ajout du membre.';
         } finally {
             inviting = false;
+        }
+    }
+
+    async function handleApproveRequest(userId: string) {
+        try {
+            await approveJoinRequest(clubSlug, userId);
+            joinRequests = joinRequests.filter(r => r.userId !== userId);
+            members = await getClubMembers(clubSlug);
+        } catch (e: any) {
+            alert("Erreur lors de l'approbation : " + e.message);
+        }
+    }
+
+    async function handleRejectRequest(userId: string) {
+        try {
+            await rejectJoinRequest(clubSlug, userId);
+            joinRequests = joinRequests.filter(r => r.userId !== userId);
+        } catch (e: any) {
+            alert("Erreur lors du refus : " + e.message);
         }
     }
 
@@ -96,36 +134,88 @@
         </div>
     </div>
 
-    <!-- Invite Section (only for OWNER or ADMIN) -->
+    <!-- Join Requests Section (only for OWNER or ADMIN) -->
     {#if canManageMembers}
-        <form onsubmit={handleInviteMember} class="bg-background/40 border border-gray-800 p-5 rounded-lg space-y-4 max-w-xl">
-            <h3 class="text-sm font-title text-white uppercase tracking-wider">Recruter un Initié</h3>
-            
-            <div class="flex flex-col sm:flex-row gap-3">
-                <input 
-                    type="email" 
-                    placeholder="Adresse email de l'initié..." 
-                    bind:value={inviteEmail}
-                    required
-                    class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm flex-1"
-                />
-                <Cta 
-                    type="submit" 
-                    disabled={inviting}
-                    text={inviting ? 'Recrutement...' : 'Ajouter au cercle'}
-                    dragon="Pura"
-                    border="Pura"
-                    class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-black shrink-0"
-                />
-            </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Form recruitment -->
+            <form onsubmit={handleInviteMember} class="bg-background/40 border border-gray-800 p-5 rounded-lg space-y-4">
+                <h3 class="text-sm font-title text-white uppercase tracking-wider">Recruter un Initié</h3>
+                
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input 
+                        type="email" 
+                        placeholder="Adresse email de l'initié..." 
+                        bind:value={inviteEmail}
+                        required
+                        class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm flex-1"
+                    />
+                    <Cta 
+                        type="submit" 
+                        disabled={inviting}
+                        text={inviting ? 'Recrutement...' : 'Ajouter au cercle'}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-black shrink-0"
+                    />
+                </div>
 
-            {#if inviteError}
-                <p class="text-xs text-Chronos font-text">{inviteError}</p>
-            {/if}
-            {#if inviteSuccess}
-                <p class="text-xs text-Guizamark font-text">L'initié a été ajouté avec succès au cercle !</p>
-            {/if}
-        </form>
+                {#if inviteError}
+                    <p class="text-xs text-Chronos font-text">{inviteError}</p>
+                {/if}
+                {#if inviteSuccess}
+                    <p class="text-xs text-Guizamark font-text">L'initié a été ajouté avec succès au cercle !</p>
+                {/if}
+            </form>
+
+            <!-- Pending Join Requests -->
+            <div class="bg-background/40 border border-gray-800 p-5 rounded-lg space-y-4 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-title text-white uppercase tracking-wider mb-3">Demandes d'adhésion en attente</h3>
+                    
+                    {#if requestsLoading}
+                        <div class="text-xs text-gray-400 font-text animate-pulse">Chargement des requêtes...</div>
+                    {:else if requestsError}
+                        <p class="text-xs text-Chronos font-text">{requestsError}</p>
+                    {:else if joinRequests.length === 0}
+                        <p class="text-xs text-gray-500 font-text italic py-2">Aucune demande d'adhésion en attente.</p>
+                    {:else}
+                        <div class="space-y-3 max-h-48 overflow-y-auto pr-1">
+                            {#each joinRequests as req (req.id)}
+                                <div class="flex items-center justify-between p-3 bg-background/50 border border-gray-800/60 rounded-md">
+                                    <div class="flex items-center space-x-3 min-w-0">
+                                        {#if req.user.image}
+                                            <img src={getImageUrl(req.user.image)} alt="" class="w-7 h-7 rounded-full object-cover" />
+                                        {:else}
+                                            <div class="w-7 h-7 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs shrink-0">
+                                                {req.user.name?.charAt(0) || 'U'}
+                                            </div>
+                                        {/if}
+                                        <div class="min-w-0">
+                                            <div class="text-xs font-semibold text-white truncate">{req.user.name || 'Utilisateur'}</div>
+                                            <div class="text-[10px] text-gray-500 truncate">{censorEmail(req.user.email)}</div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center space-x-2 shrink-0">
+                                        <button 
+                                            onclick={() => handleApproveRequest(req.userId)}
+                                            class="px-2.5 py-1 rounded bg-Guizamark/10 hover:bg-Guizamark text-Guizamark hover:text-black border border-Guizamark/20 text-[10px] uppercase font-title tracking-wider transition-colors cursor-pointer"
+                                        >
+                                            Accepter
+                                        </button>
+                                        <button 
+                                            onclick={() => handleRejectRequest(req.userId)}
+                                            class="px-2.5 py-1 rounded bg-Chronos/10 hover:bg-Chronos text-Chronos hover:text-white border border-Chronos/20 text-[10px] uppercase font-title tracking-wider transition-colors cursor-pointer"
+                                        >
+                                            Refuser
+                                        </button>
+                                    </div>
+                                </div>
+                            {/each}
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
     {/if}
 
     {#if loading}
