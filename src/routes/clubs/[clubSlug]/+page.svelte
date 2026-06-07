@@ -125,7 +125,11 @@
         {#if userRole === null}
             <div class="max-w-2xl mx-auto my-12 p-8 bg-background/40 backdrop-blur-md border border-secondary/30 rounded-lg text-center shadow-xl space-y-6">
                 <div class="w-16 h-16 bg-secondary/10 text-secondary border border-secondary/30 rounded-full flex items-center justify-center mx-auto text-3xl">
-                    {#if club.isPublic}🔓{:else}🔒{/if}
+                    {#if club.isPublic}
+                    <img src="/dragons_logos/normal/Pestia.svg" alt="" class="w-full h-full object-contain primary-svg">
+                    {:else}
+                    <img src="/dragons_logos/normal/Shizari.svg" alt="" class="w-full h-full object-contain primary-svg">
+                    {/if}
                 </div>
                 
                 <div class="space-y-2">
@@ -151,22 +155,22 @@
                             text={joining ? "Rejointement..." : "Rejoindre le cercle"}
                             disabled={joining}
                             onClick={handleJoinClub}
-                            dragon="Artrish"
-                            border="Yinva"
-                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
+                            dragon="Lada"
+                            border="Pestia"
+                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider text-background hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
                         />
                     {:else if hasPendingRequest}
                         <div class="px-6 py-3 border border-secondary/30 bg-secondary/10 text-secondary rounded-lg font-title uppercase tracking-widest text-sm animate-pulse">
-                            ⏳ Demande d'adhésion en attente
+                            Demande d'adhésion en attente
                         </div>
                     {:else}
                         <Cta 
                             text={joining ? "Envoi..." : "Demander à rejoindre"}
                             disabled={joining}
                             onClick={handleJoinClub}
-                            dragon="Artrish"
-                            border="Yinva"
-                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
+                            dragon="Pestia"
+                            border="Lada"
+                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider text-foreground hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
                         />
                     {/if}
                 </div>

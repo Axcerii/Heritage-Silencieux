@@ -47,24 +47,25 @@
     class="group text-left w-full relative overflow-hidden bg-background/60 backdrop-blur-md border {theme.border} {theme.hoverBorder} {theme.shadow} p-6 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:-translate-y-1 flex flex-col justify-between min-h-[160px]"
 >
     <!-- Background Dragon Watermark -->
-    <div class="absolute right-[-20px] bottom-[-20px] w-36 h-36 opacity-10 group-hover:opacity-20 group-hover:scale-110 transition-all duration-500 pointer-events-none">
+    <div class="absolute right-[-20px] bottom-[-20px] w-36 h-36 opacity-20 group-hover:opacity-30 group-hover:scale-110 transition-all duration-500 pointer-events-none">
         <img src={theme.logo} alt="" class="w-full h-full object-contain {theme.svgFilter}" />
+    </div>
+
+    <!-- Background Bookshelf -->
+    <div class="absolute top-[-50%] left-0 h-[200%] opacity-1 group-hover:opacity-5 group-hover:scale-110 transition-all duration-500 pointer-events-none">
+        <img src="/Bookshelf.svg" alt="" class="w-full h-full object-contain {theme.svgFilter}" />
     </div>
 
     <div>
         <div class="flex items-center justify-between mb-2">
-            <div class="flex items-center space-x-2">
-                <span class="text-xs uppercase tracking-widest text-gray-400 font-text">Sceau de l'Ordre</span>
+
                 {#if club.isPublic}
-                    <span class="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-secondary/20 text-secondary border border-secondary/30">Public</span>
+                    <span class="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-accent/20 text-accent border border-accent/30">Public</span>
                 {:else}
-                    <span class="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-Pestia/20 text-Pestia border border-Pestia/30">Privé</span>
+                    <span class="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30">Privé</span>
                 {/if}
-            </div>
             {#if !club.isActive}
                 <span class="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-Chronos/20 text-Chronos border border-Chronos/30">Inactif</span>
-            {:else}
-                <span class="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-Guizamark/20 text-Guizamark border border-Guizamark/30">Actif</span>
             {/if}
         </div>
         <h3 class="text-xl sm:text-2xl font-title {theme.color} leading-tight mb-1 group-hover:text-shadow transition-all duration-300">
@@ -76,6 +77,6 @@
     </div>
 
     <div class="mt-4 pt-4 border-t border-gray-800/50 flex items-center justify-end">
-        <span class="text-xs {theme.color} font-title tracking-wider group-hover:translate-x-1 transition-transform duration-200">Entrer →</span>
+        <span class="text-xl {theme.color} font-title tracking-wider group-hover:translate-x-1 transition-transform duration-200">Consulter →</span>
     </div>
 </button>
