@@ -40,7 +40,7 @@
             const allClubs = await getClubs();
             club = allClubs.find(c => c.slug === data.clubSlug) || null;
             if (!club) {
-                error = "Cercle introuvable.";
+                error = "Bibliothèque introuvable.";
                 return;
             }
 
@@ -52,7 +52,7 @@
                 hasPendingRequest = status.hasPendingRequest;
             }
         } catch (e: any) {
-            error = e.message || "Erreur lors du chargement du cercle.";
+            error = e.message || "Erreur lors du chargement de la bibliothèque.";
         } finally {
             loading = false;
         }
@@ -71,7 +71,7 @@
                 hasPendingRequest = true;
             }
         } catch (e: any) {
-            joinError = e.message || "Impossible de rejoindre le cercle.";
+            joinError = e.message || "Impossible de rejoindre la bibliothèque.";
         } finally {
             joining = false;
         }
@@ -87,19 +87,19 @@
 </script>
 
 <svelte:head>
-    <title>{club ? club.name : 'Cercle'} — Heritage Silencieux</title>
+    <title>{club ? club.name : 'Bibliothèque'} — Heritage Silencieux</title>
 </svelte:head>
 
 {#if loading}
     <div class="flex flex-col items-center justify-center py-20 flex-1">
         <div class="w-10 h-10 border-2 border-secondary border-t-transparent rounded-full animate-spin mb-3"></div>
-        <p class="text-secondary font-title text-lg">Déchiffrement des sceaux du cercle...</p>
+        <p class="text-secondary font-title text-lg">Déchiffrement des sceaux du bibliothèque...</p>
     </div>
 {:else if error || !club}
     <div class="w-full max-w-md mx-auto my-12 p-6 border border-Chronos/30 bg-Chronos/10 text-Chronos rounded-lg text-center font-text">
-        <p class="mb-4">{error || "Cercle introuvable."}</p>
+        <p class="mb-4">{error || "Bibliothèque introuvable."}</p>
         <a href="/" class="px-4 py-2 bg-Chronos text-white rounded font-title hover:bg-Chronos/85 transition-colors inline-block">
-            Retour aux cercles
+            Retour à la liste des bibliothèques
         </a>
     </div>
 {:else}
@@ -109,13 +109,9 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-secondary/20 pb-6 gap-4">
             <div>
                 <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">{club.name}</h1>
-                <p class="text-gray-400 font-text text-sm">
-                    Cercle unique : <span class="text-white italic">/{club.slug}</span>
-                </p>
             </div>
             
             <div class="flex flex-col sm:items-end">
-                <span class="text-xs text-gray-400 font-text">Votre grade dans ce cercle :</span>
                 <span class="text-sm font-title uppercase tracking-wider text-secondary mt-1">
                     {userRole === 'OWNER' ? 'Propriétaire' : userRole === 'EDITOR' ? 'Éditeur' : userRole === 'READER' ? 'Lecteur' : 'Visiteur'}
                 </span>
@@ -124,6 +120,9 @@
 
         {#if userRole === null}
             <div class="max-w-2xl mx-auto my-12 p-8 bg-background/40 backdrop-blur-md border border-secondary/30 rounded-lg text-center shadow-xl space-y-6">
+                <div class="absolute w-full top-0 left-0 z-[-1] secondary-svg opacity-20 pointer-events-none">
+                    <img src="/Envelope.svg" alt="" class="w-full h-full object-contain primary-svg">
+                </div>
                 <div class="w-16 h-16 bg-secondary/10 text-secondary border border-secondary/30 rounded-full flex items-center justify-center mx-auto text-3xl">
                     {#if club.isPublic}
                     <img src="/dragons_logos/normal/Pestia.svg" alt="" class="w-full h-full object-contain primary-svg">
@@ -134,13 +133,13 @@
                 
                 <div class="space-y-2">
                     <h2 class="text-2xl font-title text-secondary tracking-wider">
-                        {#if club.isPublic}Cercle de lecture Public{:else}Cercle de lecture Privé{/if}
+                        {#if club.isPublic}Bibliothèque de lecture publique{:else}Bibliothèque de lecture privée{/if}
                     </h2>
                     <p class="text-gray-400 font-text text-sm sm:text-base leading-relaxed">
                         {#if club.isPublic}
-                            Ce cercle est public. Rejoignez la communauté des lecteurs pour accéder à sa bibliothèque, partager vos avis, et suivre votre progression.
+                            Cette bibliothèque est publique. Rejoignez la communauté des lecteurs pour y accéder, partager vos avis, et suivre votre progression.
                         {:else}
-                            Ce cercle de lecture est privé. Vous devez envoyer une demande d'adhésion pour que le propriétaire valide votre entrée.
+                            Cette bibliothèque est privée. Vous devez envoyer une demande d'adhésion pour que le propriétaire valide votre entrée.
                         {/if}
                     </p>
                 </div>
@@ -152,16 +151,16 @@
                 <div class="pt-4 flex justify-center">
                     {#if club.isPublic}
                         <Cta 
-                            text={joining ? "Rejointement..." : "Rejoindre le cercle"}
+                            text={joining ? "Demande en cours..." : "Rejoindre la bibliothèque"}
                             disabled={joining}
                             onClick={handleJoinClub}
-                            dragon="Lada"
-                            border="Pestia"
-                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider text-background hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
+                            dragon="Pestia"
+                            border="Lada"
+                            class="!w-auto px-8 py-3 font-title text-base uppercase tracking-wider text-foreground hover:shadow-[0_0_15px_rgba(210,182,116,0.3)] transition-all cursor-pointer"
                         />
                     {:else if hasPendingRequest}
                         <div class="px-6 py-3 border border-secondary/30 bg-secondary/10 text-secondary rounded-lg font-title uppercase tracking-widest text-sm animate-pulse">
-                            Demande d'adhésion en attente
+                            Demande d'adhésion envoyée...
                         </div>
                     {:else}
                         <Cta 

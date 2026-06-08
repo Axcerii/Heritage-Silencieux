@@ -52,7 +52,7 @@
     </div>
 
     <!-- Background Bookshelf -->
-    <div class="absolute top-[-50%] left-0 h-[200%] opacity-1 group-hover:opacity-5 group-hover:scale-110 transition-all duration-500 pointer-events-none">
+    <div class="absolute top-[-50%] left-0 h-[200%] opacity-5 group-hover:opacity-10 group-hover:scale-110 transition-all duration-500 pointer-events-none">
         <img src="/Bookshelf.svg" alt="" class="w-full h-full object-contain {theme.svgFilter}" />
     </div>
 

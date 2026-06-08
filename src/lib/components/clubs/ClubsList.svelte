@@ -119,7 +119,7 @@
         </div>
     {:else}
         <!-- Grid list of clubs -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
             {#each filteredClubs as club (club.id)}
                 <ClubCard {club} onSelect={onSelectClub} />
             {/each}

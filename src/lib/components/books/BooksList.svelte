@@ -147,7 +147,7 @@
                 type="text" 
                 placeholder="Filtrer par titre..." 
                 bind:value={titleQuery}
-                class="w-full bg-primary/20 text-white border border-gray-800 focus:border-secondary h-10 px-3 text-sm"
+                class="w-full bg-Lada! text-background border border-Pestia! focus:border-accent! h-10 px-3 text-sm"
             />
         </div>
         <div>
@@ -157,7 +157,7 @@
                 type="text" 
                 placeholder="Filtrer par auteur..." 
                 bind:value={authorQuery}
-                class="w-full bg-primary/20 text-white border border-gray-800 focus:border-secondary h-10 px-3 text-sm"
+                class="w-full bg-Lada! text-background border border-Pestia! focus:border-accent! h-10 px-3 text-sm"
             />
         </div>
         <div>
@@ -167,9 +167,9 @@
                 bind:value={selectedGenre}
                 class="w-full bg-primary/20 text-white border border-gray-800 focus:border-secondary rounded-[var(--radius)] h-10 px-2 font-text text-sm cursor-pointer"
             >
-                <option value="">Tous les genres</option>
+                <option value="" class="bg-background cursor-pointer">Tous les genres</option>
                 {#each genres as genre}
-                    <option value={genre}>{genre}</option>
+                    <option value={genre} class="bg-background cursor-pointer">{genre}</option>
                 {/each}
             </select>
         </div>
