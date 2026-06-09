@@ -213,14 +213,14 @@
                                 onclick={() => activeClubTab = 'library'}
                                 class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeClubTab === 'library' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
                             >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" /></svg>
-                                Bibliothèque
+                                <img src="/dragons_logos/normal/Lada.svg" alt="" class="w-8 h-8 secondary-svg">
+                                Livres
                             </button>
                             <button 
                                 onclick={() => activeClubTab = 'members'}
                                 class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeClubTab === 'members' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
                             >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0 1 10.089 20.4H9.91a11.386 11.386 0 0 1-4.828-1.163v-.109a9.38 9.38 0 0 1 2.625-.372 9.337 9.337 0 0 1 4.121-.952 4.125 4.125 0 0 1 7.533 2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.109A11.386 11.386 0 0 1 10.089 20.4H9.91a11.386 11.386 0 0 1-4.828-1.163v-.109a9.38 9.38 0 0 1 2.625-.372 9.337 9.337 0 0 1 4.121-.952 4.125 4.125 0 0 1 7.533 2.493M9 4a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm-5.7 12.1a3 3 0 1 1-2.4 0m5.7-12.1a3 3 0 1 1 0 6 3 3 0 0 1 0-6Zm8.4 0a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z" /></svg>
+                                <img src="/dragons_logos/normal/Pestia.svg" alt="" class="w-8 h-8 secondary-svg">
                                 Membres
                             </button>
                         </nav>
@@ -234,8 +234,8 @@
                                     <Cta 
                                         text="Ajouter un Livre"
                                         onClick={() => { activeClubTab = 'library'; showAddModal = true; }}
-                                        dragon="Pura"
-                                        border="Pura"
+                                        dragon="Lada"
+                                        border="Pestia"
                                         class="h-9 px-4 font-title text-[13px] uppercase tracking-wider !text-black w-full flex items-center justify-center cursor-pointer"
                                     />
                                 {/if}
@@ -243,8 +243,8 @@
                                     <Cta 
                                         text="Exporter (CSV)"
                                         onClick={handleExportCsv}
-                                        dragon="Aqua"
-                                        border="Aqua"
+                                        dragon="Shizari"
+                                        border="Guizamark"
                                         class="h-9 px-4 font-title text-[13px] uppercase tracking-wider text-white w-full flex items-center justify-center cursor-pointer"
                                     />
                                 {/if}
@@ -260,7 +260,7 @@
                             onclick={() => activeClubTab = 'library'}
                             class="px-2.5 py-1.5 font-title text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
                         >
-                            Bibliothèque
+                            Livres
                         </button>
                         <button 
                             onclick={() => activeClubTab = 'members'}
