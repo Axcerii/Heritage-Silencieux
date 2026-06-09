@@ -1,14 +1,15 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getBooks, createBook, exportLibraryCsv, type Book } from '../../api';
+    import { getBooks, createBook, type Book } from '../../api';
     import type { AuthSession } from '../../auth-client';
     import Cta from '../Cta.svelte';
 
-    let { clubSlug, userRole, session, onSelectBook } = $props<{
+    let { clubSlug, userRole, session, onSelectBook, showAddModal = $bindable(false) } = $props<{
         clubSlug: string;
         userRole: 'OWNER' | 'EDITOR' | 'READER' | null;
         session: AuthSession;
         onSelectBook: (book: Book) => void;
+        showAddModal?: boolean;
     }>();
 
     let books = $state<Book[]>([]);
@@ -33,7 +34,6 @@
     );
 
     // Book Creation Modal
-    let showAddModal = $state(false);
     let newBookTitle = $state('');
     let newBookAuthor = $state('');
     let newBookGenre = $state('');
@@ -81,22 +81,7 @@
         }
     }
 
-    async function handleExportCsv() {
-        try {
-            const csvData = await exportLibraryCsv(clubSlug);
-            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `bibliotheque-${clubSlug}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (e: any) {
-            alert('Erreur lors de l\'exportation CSV: ' + e.message);
-        }
-    }
+
 
     function renderStars(rating: number | null) {
         if (rating === null) return 'Aucune évaluation';
@@ -114,27 +99,6 @@
         <div>
             <h2 class="text-2xl font-title text-secondary tracking-wider">Bibliothèque du Cercle</h2>
             <p class="text-sm text-gray-400 font-text">Consultez, lisez et évaluez les manuscrits partagés.</p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            {#if userRole !== null || session.user.role === 'ADMIN'}
-                <Cta 
-                    text="Exporter (CSV)"
-                    onClick={handleExportCsv}
-                    dragon="Aqua"
-                    border="Aqua"
-                    class="h-10 px-4 font-title text-[15px] uppercase tracking-wider text-white sm:w-auto"
-                />
-            {/if}
-            {#if canManageBooks}
-                <Cta 
-                    text="Ajouter un Livre"
-                    onClick={() => showAddModal = true}
-                    dragon="Pura"
-                    border="Pura"
-                    class="h-10 px-4 font-title text-[15px] uppercase tracking-wider !text-black sm:w-auto"
-                />
-            {/if}
         </div>
     </div>
 
