@@ -206,6 +206,14 @@
             <div class="flex flex-col md:flex-row gap-8 items-start">
                 <!-- Sidebar on Desktop (viewport fixed on left) -->
                 <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto">
+                    <!-- Back Button to Circle List -->
+                    <a 
+                        href="/" 
+                        class="flex items-center justify-center gap-2 font-title text-sm tracking-wider text-secondary hover:text-white hover:underline rounded transition-all duration-200 cursor-pointer"
+                    >
+                        ← Retour à l'entrée
+                    </a>
+
                     <div class="space-y-2">
                         <span class="text-xs font-text uppercase tracking-widest text-gray-400">Sections</span>
                         <nav class="flex flex-col gap-2">
@@ -254,20 +262,29 @@
                 </aside>
 
                 <!-- Mobile Actions / Tabs (Mobile Only) -->
-                <div class="md:hidden w-full flex items-center justify-between border-b border-gray-800 pb-2">
-                    <div class="flex gap-1 border-b border-transparent">
-                        <button 
-                            onclick={() => activeClubTab = 'library'}
-                            class="px-2.5 py-1.5 font-title text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                <div class="md:hidden w-full flex items-center justify-between border-b border-gray-800 pb-2 gap-4">
+                    <div class="flex items-center gap-2">
+                        <a 
+                            href="/" 
+                            class="w-8 h-8 mr-4 text-secondary font-title text-lg border border-secondary/35 bg-secondary/15 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0 hover:bg-secondary/25 active:scale-95 duration-200"
                         >
-                            Livres
-                        </button>
-                        <button 
-                            onclick={() => activeClubTab = 'members'}
-                            class="px-2.5 py-1.5 font-title text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'members' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
-                        >
-                            Membres
-                        </button>
+                            ←
+                        </a>
+                        
+                        <div class="flex gap-0.5 border-b border-transparent">
+                            <button 
+                                onclick={() => activeClubTab = 'library'}
+                                class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                            >
+                                Livres
+                            </button>
+                            <button 
+                                onclick={() => activeClubTab = 'members'}
+                                class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'members' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                            >
+                                Membres
+                            </button>
+                        </div>
                     </div>
 
                     {#if canManageBooks || canExportCsv}

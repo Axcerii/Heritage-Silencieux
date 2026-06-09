@@ -192,7 +192,9 @@
                                         {/if}
                                         <div class="min-w-0">
                                             <div class="text-xs font-semibold text-white truncate">{req.user.name || 'Utilisateur'}</div>
-                                            <div class="text-[10px] text-gray-500 truncate">{censorEmail(req.user.email)}</div>
+                                            {#if session.user.role === 'ADMIN'}
+                                                <div class="text-[10px] text-gray-500 truncate">{censorEmail(req.user.email)}</div>
+                                            {/if}
                                         </div>
                                     </div>
                                     <div class="flex items-center space-x-2 shrink-0">
@@ -232,7 +234,9 @@
                 <thead>
                     <tr class="border-b border-gray-800 text-[10px] uppercase tracking-widest text-gray-500 font-text">
                         <th class="p-4">Initié</th>
-                        <th class="p-4">Email</th>
+                        {#if session.user.role === 'ADMIN'}
+                            <th class="p-4">Email</th>
+                        {/if}
                         <th class="p-4">Rôle</th>
                         {#if canManageMembers}
                             <th class="p-4 text-right">Actions</th>
@@ -252,7 +256,9 @@
                                 {/if}
                                 <span class="text-white font-semibold">{member.user.name || 'Utilisateur'}</span>
                             </td>
-                            <td class="p-4 text-gray-400 font-text">{censorEmail(member.user.email)}</td>
+                            {#if session.user.role === 'ADMIN'}
+                                <td class="p-4 text-gray-400 font-text">{censorEmail(member.user.email)}</td>
+                            {/if}
                             <td class="p-4">
                                 {#if canManageMembers && member.userId !== session.user.id}
                                     <select 

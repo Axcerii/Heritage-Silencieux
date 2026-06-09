@@ -3,6 +3,7 @@
     import { getBooks, createBook, type Book } from '../../api';
     import type { AuthSession } from '../../auth-client';
     import Cta from '../Cta.svelte';
+    import BookCard from './BookCard.svelte';
 
     let { clubSlug, userRole, session, onSelectBook, showAddModal = $bindable(false) } = $props<{
         clubSlug: string;
@@ -95,13 +96,6 @@
 </script>
 
 <div class="space-y-6">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-800 pb-4 gap-4">
-        <div>
-            <h2 class="text-2xl font-title text-secondary tracking-wider">Bibliothèque du Cercle</h2>
-            <p class="text-sm text-gray-400 font-text">Consultez, lisez et évaluez les manuscrits partagés.</p>
-        </div>
-    </div>
-
     <!-- Filters -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-background/40 p-4 border border-gray-800 rounded-lg">
         <div>
@@ -153,30 +147,9 @@
         </div>
     {:else}
         <!-- Books grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {#each filteredBooks as book (book.id)}
-                <div class="bg-background/80 border border-gray-800 hover:border-secondary/40 rounded-lg p-5 flex flex-col justify-between transition-all duration-200 group">
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded bg-secondary/15 text-secondary">{book.genre}</span>
-                        </div>
-                        <h3 class="text-xl font-title text-white group-hover:text-secondary transition-colors leading-snug line-clamp-1">{book.title}</h3>
-                        <p class="text-sm text-gray-400 font-text italic mt-1 mb-4">par {book.author}</p>
-                    </div>
-
-                    <div class="border-t border-gray-800/60 pt-4 flex items-center justify-between mt-4">
-                        <div class="flex flex-col">
-                            <span class="text-[10px] uppercase text-gray-500 font-text tracking-wider">Évaluation</span>
-                            <span class="text-sm text-secondary font-text">{renderStars(book.averageRating)}</span>
-                        </div>
-                        <button 
-                            onclick={() => onSelectBook(book)}
-                            class="px-4 py-1.5 rounded-[var(--radius)] font-title text-xs uppercase tracking-wider text-black bg-secondary hover:bg-secondary/90 transition-colors cursor-pointer"
-                        >
-                            Ouvrir
-                        </button>
-                    </div>
-                </div>
+                <BookCard {book} onSelect={onSelectBook} />
             {/each}
         </div>
     {/if}
