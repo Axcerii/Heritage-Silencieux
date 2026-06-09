@@ -32,8 +32,14 @@ html {
     background-color: var(--background);
     background-image: url("/soft-neige1B1B1B.png");
     color: var(--foreground);
-    font-family: var(--textFont);
-    font-size: 20px;
+    font-family: var(--font-text);
+    font-size: 16px;
+}
+
+@media (min-width: 640px) {
+    html {
+        font-size: 20px;
+    }
 }
 
 .primary-svg {
@@ -48,17 +54,73 @@ html {
     filter: invert(76%) sepia(57%) saturate(281%) hue-rotate(2deg) brightness(88%) contrast(87%);
 }
 
+.Artrish-svg {
+    filter: invert(1);
+}
+
+.Yinva-svg {
+    filter: invert(78%) sepia(52%) saturate(214%) hue-rotate(293deg) brightness(95%) contrast(88%);
+}
+
+.Guizamark-svg {
+    filter: invert(90%) sepia(13%) saturate(311%) hue-rotate(52deg) brightness(101%) contrast(81%);
+}
+
+.Shizari-svg {
+    filter: invert(0%) sepia(53%) saturate(56%) hue-rotate(332deg) brightness(113%) contrast(79%);
+}
+
+.Pestia-svg {
+    filter: invert(40%) sepia(19%) saturate(3204%) hue-rotate(213deg) brightness(91%) contrast(89%);
+}
+
+.Chronos-svg {
+    filter: invert(36%) sepia(50%) saturate(5838%) hue-rotate(342deg) brightness(88%) contrast(76%);
+}
+
+.Aqua-svg {
+    filter: invert(71%) sepia(0%) saturate(82%) hue-rotate(231deg) brightness(94%) contrast(91%);
+}
+
+.Goliath-svg {
+    filter: invert(34%) sepia(45%) saturate(540%) hue-rotate(340deg) brightness(94%) contrast(84%);
+}
+
+.Drii-svg {
+    filter: invert(23%) sepia(26%) saturate(3730%) hue-rotate(269deg) brightness(94%) contrast(89%);
+}
+
+.Lada-svg {
+    filter: invert(92%) sepia(12%) saturate(1138%) hue-rotate(0deg) brightness(107%) contrast(91%);
+}
+
+.Pura-svg {
+    filter: invert(76%) sepia(57%) saturate(281%) hue-rotate(2deg) brightness(88%) contrast(87%);
+}
+
 input {
     background-color: var(--color-primary);
     border: var(--color-foreground) 1px solid;
     border-radius: var(--radius);
-    font-size: 20px;
+    font-size: 16px;
     width: 100%;
     height: 48px;
     font-family: var(--font-text);
-
     box-sizing: border-box;
     padding: 0 1rem;
+    transition: all 0.2s ease-in-out;
+}
+
+@media (min-width: 640px) {
+    input {
+        font-size: 18px;
+    }
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 10px rgba(210, 182, 116, 0.4);
 }
 
 input::placeholder {
@@ -72,4 +134,109 @@ h4,
 h5,
 h6 {
     font-family: var(--font-title);
+}
+
+
+
+/* EasyMDE Custom Theme Styling */
+.EasyMDEContainer {
+    font-family: var(--font-text) !important;
+}
+
+.EasyMDEContainer .editor-toolbar {
+    background-color: rgba(27, 27, 27, 0.95) !important;
+    border: 1px solid rgba(210, 182, 116, 0.3) !important;
+    border-top-left-radius: var(--radius);
+    border-top-right-radius: var(--radius);
+    opacity: 1 !important;
+}
+
+.EasyMDEContainer .editor-toolbar button {
+    color: #fff !important;
+    border: 1px solid transparent !important;
+    border-radius: var(--radius);
+    transition: all 0.2s ease;
+}
+
+.EasyMDEContainer .editor-toolbar button:hover {
+    background: rgba(210, 182, 116, 0.2) !important;
+    color: var(--color-secondary) !important;
+    border-color: rgba(210, 182, 116, 0.4) !important;
+}
+
+.EasyMDEContainer .editor-toolbar button.active {
+    background: var(--color-secondary) !important;
+    color: #000 !important;
+}
+
+.EasyMDEContainer .editor-toolbar i.separator {
+    border-right-color: rgba(210, 182, 116, 0.3) !important;
+    border-left-color: transparent !important;
+}
+
+.EasyMDEContainer .CodeMirror {
+    background-color: #faf4eb !important;
+    color: #2c251e !important;
+    border: 1px solid rgba(210, 182, 116, 0.3) !important;
+    border-top: none !important;
+    border-bottom-left-radius: var(--radius);
+    border-bottom-right-radius: var(--radius);
+    font-size: 16px;
+    font-family: var(--font-text), monospace;
+}
+
+.EasyMDEContainer .CodeMirror-scroll {
+    min-height: 300px;
+}
+
+.EasyMDEContainer .CodeMirror-cursor {
+    border-left: 2px solid #2c251e !important;
+}
+
+.EasyMDEContainer .CodeMirror-selected {
+    background: rgba(210, 182, 116, 0.35) !important;
+}
+
+.EasyMDEContainer .editor-preview,
+.EasyMDEContainer .editor-preview-side {
+    background-color: #faf4eb !important;
+    color: #2c251e !important;
+    border: 1px solid rgba(210, 182, 116, 0.3) !important;
+    font-family: var(--font-text) !important;
+}
+
+.EasyMDEContainer .editor-preview h1,
+.EasyMDEContainer .editor-preview h2,
+.EasyMDEContainer .editor-preview h3,
+.EasyMDEContainer .editor-preview h4,
+.EasyMDEContainer .editor-preview-side h1,
+.EasyMDEContainer .editor-preview-side h2,
+.EasyMDEContainer .editor-preview-side h3,
+.EasyMDEContainer .editor-preview-side h4 {
+    font-family: var(--font-title) !important;
+    color: #8a7657 !important;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.EasyMDEContainer .editor-preview p,
+.EasyMDEContainer .editor-preview-side p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+.EasyMDEContainer .editor-preview img,
+.EasyMDEContainer .editor-preview-side img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    border: 1px solid rgba(210, 182, 116, 0.2);
+    margin: 1rem auto;
+    display: block;
+}
+
+.EasyMDEContainer .editor-statusbar {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-family: var(--font-text) !important;
+    font-size: 12px;
 }
