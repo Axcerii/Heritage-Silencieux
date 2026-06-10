@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import { getClubs, getJoinStatus, joinClub, exportLibraryCsv, type Club, type Book } from '$lib/api';
+    import { getClubs, getJoinStatus, joinClub, exportLibraryCsv, updateClub, type Club, type Book, type DragonTheme } from '$lib/api';
     import type { AuthSession } from '$lib/auth-client';
     import BooksList from '$lib/components/books/BooksList.svelte';
     import MembersList from '$lib/components/members/MembersList.svelte';
@@ -41,7 +41,68 @@
         }
     });
 
-    let activeClubTab = $state<'library' | 'members'>('library');
+    let activeClubTab = $state<'library' | 'members' | 'admin'>('library');
+
+    // Club Edit Form Inputs (for OWNER only)
+    let editClubName = $state('');
+    let editClubSlug = $state('');
+    let editClubIsPublic = $state(true);
+    let editClubTheme = $state<DragonTheme | ''>('');
+    let updatingClub = $state(false);
+    let updateClubError = $state<string | null>(null);
+    let updateClubSuccess = $state(false);
+
+    const DRAGON_THEMES = [
+        { name: 'Yinva', color: 'text-Yinva', bg: 'bg-Yinva', border: 'border-Yinva/30', hoverBorder: 'hover:border-Yinva', shadow: 'hover:shadow-[0_0_20px_rgba(229,184,204,0.25)]', logo: '/dragons_logos/normal/Yinva.svg', svgFilter: 'Yinva-svg' },
+        { name: 'Guizamark', color: 'text-Guizamark', bg: 'bg-Guizamark', border: 'border-Guizamark/30', hoverBorder: 'hover:border-Guizamark', shadow: 'hover:shadow-[0_0_20px_rgba(207,223,196,0.25)]', logo: '/dragons_logos/normal/Guizamark.svg', svgFilter: 'Guizamark-svg' },
+        { name: 'Pestia', color: 'text-Pestia', bg: 'bg-Pestia', border: 'border-Pestia/30', hoverBorder: 'hover:border-Pestia', shadow: 'hover:shadow-[0_0_20px_rgba(97,93,211,0.25)]', logo: '/dragons_logos/normal/Pestia.svg', svgFilter: 'Pestia-svg' },
+        { name: 'Chronos', color: 'text-Chronos', bg: 'bg-Chronos', border: 'border-Chronos/30', hoverBorder: 'hover:border-Chronos', shadow: 'hover:shadow-[0_0_20px_rgba(202,68,68,0.25)]', logo: '/dragons_logos/normal/Chronos.svg', svgFilter: 'Chronos-svg' },
+        { name: 'Aqua', color: 'text-Aqua', bg: 'bg-Aqua', border: 'border-Aqua/30', hoverBorder: 'hover:border-Aqua', shadow: 'hover:shadow-[0_0_20px_rgba(166,166,166,0.25)]', logo: '/dragons_logos/normal/Aqua.svg', svgFilter: 'Aqua-svg' },
+        { name: 'Goliath', color: 'text-Goliath', bg: 'bg-Goliath', border: 'border-Goliath/30', hoverBorder: 'hover:border-Goliath', shadow: 'hover:shadow-[0_0_20px_rgba(132,88,60,0.25)]', logo: '/dragons_logos/normal/Goliath.svg', svgFilter: 'Goliath-svg' },
+        { name: 'Drii', color: 'text-Drii', bg: 'bg-Drii', border: 'border-Drii/30', hoverBorder: 'hover:border-Drii', shadow: 'hover:shadow-[0_0_20px_rgba(128,48,132,0.25)]', logo: '/dragons_logos/normal/Drii.svg', svgFilter: 'Drii-svg' },
+        { name: 'Lada', color: 'text-Lada', bg: 'bg-Lada', border: 'border-Lada/30', hoverBorder: 'hover:border-Lada', shadow: 'hover:shadow-[0_0_20px_rgba(243,240,158,0.25)]', logo: '/dragons_logos/normal/Lada.svg', svgFilter: 'Lada-svg' },
+        { name: 'Pura', color: 'text-Pura', bg: 'bg-Pura', border: 'border-Pura/30', hoverBorder: 'hover:border-Pura', shadow: 'hover:shadow-[0_0_20px_rgba(210,182,116,0.25)]', logo: '/dragons_logos/normal/Pura.svg', svgFilter: 'Pura-svg' },
+        { name: 'Artrish', color: 'text-Artrish', bg: 'bg-Artrish', border: 'border-Artrish/30', hoverBorder: 'hover:border-Artrish', shadow: 'hover:shadow-[0_0_20px_rgba(255,255,255,0.15)]', logo: '/dragons_logos/normal/Artrish.svg', svgFilter: 'Artrish-svg' },
+        { name: 'Shizari', color: 'text-secondary', bg: 'bg-secondary', border: 'border-secondary/30', hoverBorder: 'hover:border-secondary', shadow: 'hover:shadow-[0_0_20px_rgba(210,182,116,0.25)]', logo: '/dragons_logos/normal/Shizari.svg', svgFilter: 'Shizari-svg' }
+    ] as const;
+
+    $effect(() => {
+        if (club) {
+            editClubName = club.name;
+            editClubSlug = club.slug;
+            editClubIsPublic = club.isPublic;
+            editClubTheme = club.theme || '';
+        }
+    });
+
+    async function handleUpdateClub(e: Event) {
+        e.preventDefault();
+        if (!club || updatingClub) return;
+        if (!editClubName.trim() || !editClubSlug.trim()) return;
+
+        updatingClub = true;
+        updateClubError = null;
+        updateClubSuccess = false;
+        try {
+            const updated = await updateClub(club.id, {
+                name: editClubName,
+                slug: editClubSlug,
+                isPublic: editClubIsPublic,
+                theme: editClubTheme || undefined
+            });
+            club = updated;
+            updateClubSuccess = true;
+            
+            // If the slug changed, navigate to the new URL
+            if (updated.slug !== data.clubSlug) {
+                goto(`/clubs/${updated.slug}`);
+            }
+        } catch (e: any) {
+            updateClubError = e.message || 'Impossible de mettre à jour la bibliothèque.';
+        } finally {
+            updatingClub = false;
+        }
+    }
 
     async function loadClubData() {
         loading = true;
@@ -141,7 +202,7 @@
             
             <div class="flex flex-col sm:items-end">
                 <span class="text-sm font-title uppercase tracking-wider text-secondary mt-1">
-                    {userRole === 'OWNER' ? 'Propriétaire' : userRole === 'EDITOR' ? 'Éditeur' : userRole === 'READER' ? 'Lecteur' : 'Visiteur'}
+                    {data.session?.user?.role === 'ADMIN' ? 'Administrateur' : userRole === 'OWNER' ? 'Propriétaire' : userRole === 'EDITOR' ? 'Éditeur' : userRole === 'READER' ? 'Lecteur' : 'Visiteur'}
                 </span>
             </div>
         </div>
@@ -231,6 +292,15 @@
                                 <img src="/dragons_logos/normal/Pestia.svg" alt="" class="w-8 h-8 secondary-svg">
                                 Membres
                             </button>
+                            {#if userRole === 'OWNER' || data.session?.user?.role === 'ADMIN'}
+                                <button 
+                                    onclick={() => activeClubTab = 'admin'}
+                                    class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeClubTab === 'admin' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
+                                >
+                                    <img src="/dragons_logos/normal/Chronos.svg" alt="" class="w-8 h-8 secondary-svg">
+                                    Administration
+                                </button>
+                            {/if}
                         </nav>
                     </div>
 
@@ -284,6 +354,14 @@
                             >
                                 Membres
                             </button>
+                            {#if userRole === 'OWNER' || data.session?.user?.role === 'ADMIN'}
+                                <button 
+                                    onclick={() => activeClubTab = 'admin'}
+                                    class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                                >
+                                    Admin
+                                </button>
+                            {/if}
                         </div>
                     </div>
 
@@ -342,12 +420,127 @@
                             onSelectBook={handleSelectBook}
                             bind:showAddModal={showAddModal}
                         />
-                    {:else}
+                    {:else if activeClubTab === 'members'}
                         <MembersList 
                             clubSlug={club.slug} 
                             userRole={userRole} 
                             session={data.session} 
                         />
+                    {:else if activeClubTab === 'admin' && (userRole === 'OWNER' || data.session?.user?.role === 'ADMIN')}
+                        <!-- Club Administration (OWNER only) -->
+                        <div class="space-y-6 font-text max-w-4xl">
+                            <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
+                                <h3 class="text-xl font-title text-secondary tracking-wider border-b border-gray-800 pb-2 font-semibold">Modifier la bibliothèque</h3>
+                                
+                                <form onsubmit={handleUpdateClub} class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                                    <!-- Left pane (fields) -->
+                                    <div class="space-y-4 md:col-span-3">
+                                        <div>
+                                            <label for="edit-club-name" class="block text-xs font-text text-gray-300 mb-1">Nom de la bibliothèque</label>
+                                            <input 
+                                                type="text" 
+                                                id="edit-club-name" 
+                                                bind:value={editClubName}
+                                                required
+                                                class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label for="edit-club-slug" class="block text-xs font-text text-gray-300 mb-1">Slug URL</label>
+                                            <input 
+                                                type="text" 
+                                                id="edit-club-slug" 
+                                                bind:value={editClubSlug}
+                                                required
+                                                class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <span class="block text-xs font-text text-gray-300 mb-1">Type d'accès</span>
+                                            <div class="grid grid-cols-2 gap-4">
+                                                <button 
+                                                    type="button"
+                                                    onclick={() => editClubIsPublic = true}
+                                                    class="p-4 rounded-lg border text-left transition-all cursor-pointer {editClubIsPublic ? 'bg-secondary/15 border-secondary text-secondary shadow-[0_0_15px_rgba(210,182,116,0.15)]' : 'bg-background/40 border-gray-800 text-gray-400 hover:border-gray-750'}"
+                                                >
+                                                    <div class="font-title text-sm uppercase tracking-wider mb-1">Public</div>
+                                                    <div class="text-[11px] font-text leading-snug text-gray-400 {editClubIsPublic ? 'text-secondary/80' : ''}">Accès libre.</div>
+                                                </button>
+                                                <button 
+                                                    type="button"
+                                                    onclick={() => editClubIsPublic = false}
+                                                    class="p-4 rounded-lg border text-left transition-all cursor-pointer {!editClubIsPublic ? 'bg-secondary/15 border-secondary text-secondary shadow-[0_0_15px_rgba(210,182,116,0.15)]' : 'bg-background/40 border-gray-800 text-gray-400 hover:border-gray-750'}"
+                                                >
+                                                    <div class="font-title text-sm uppercase tracking-wider mb-1">Privé</div>
+                                                    <div class="text-[11px] font-text leading-snug text-gray-400 {!editClubIsPublic ? 'text-secondary/80' : ''}">Demande requise.</div>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Right pane (dragon checkboxes grid) -->
+                                    <div class="md:col-span-2 flex flex-col justify-between space-y-6">
+                                        <div>
+                                            <span class="block text-xs font-text text-gray-300 mb-2">Thème Dragon (optionnel)</span>
+                                            <div class="grid grid-cols-4 gap-1.5">
+                                                {#each DRAGON_THEMES as theme}
+                                                    {@const isActive = editClubTheme === theme.name}
+                                                    <button
+                                                        type="button"
+                                                        title={theme.name}
+                                                        onclick={() => {
+                                                            if (editClubTheme === theme.name) {
+                                                                editClubTheme = '';
+                                                            } else {
+                                                                editClubTheme = theme.name;
+                                                            }
+                                                        }}
+                                                        class="relative flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all cursor-pointer select-none h-11 {isActive ? `${theme.border} bg-background/80 shadow-[0_0_12px_rgba(255,255,255,0.05)]` : 'bg-background/40 border-gray-855 hover:border-gray-750'}"
+                                                        style={isActive ? `border-color: var(--color-${theme.name}); box-shadow: 0 0 10px var(--color-${theme.name}33);` : ''}
+                                                    >
+                                                        <!-- Checkbox Indicator -->
+                                                        <div class="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-sm border flex items-center justify-center {isActive ? `${theme.bg} border-transparent text-black` : 'border-gray-800 bg-transparent'}">
+                                                            {#if isActive}
+                                                                <svg class="w-1.5 h-1.5 fill-current text-background" viewBox="0 0 20 20">
+                                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/>
+                                                                </svg>
+                                                            {/if}
+                                                        </div>
+
+                                                        <!-- Logo -->
+                                                        <div class="w-6 h-6 flex items-center justify-center">
+                                                            <img src={theme.logo} alt={theme.name} class="w-full h-full object-contain {theme.svgFilter} {isActive ? '' : 'opacity-60'}" />
+                                                        </div>
+                                                    </button>
+                                                {/each}
+                                            </div>
+                                        </div>
+
+                                        <!-- Save / Success Area -->
+                                        <div class="space-y-3 pt-4 border-t border-gray-800/80">
+                                            {#if updateClubError}
+                                                <p class="text-xs text-Chronos">{updateClubError}</p>
+                                            {/if}
+
+                                            {#if updateClubSuccess}
+                                                <p class="text-xs text-Guizamark font-text">La bibliothèque a été mise à jour avec succès.</p>
+                                            {/if}
+
+                                            <Cta 
+                                                type="submit"
+                                                disabled={updatingClub}
+                                                text={updatingClub ? 'Enregistrement...' : 'Enregistrer'}
+                                                dragon="Pura"
+                                                border="Pura"
+                                                class="h-10 w-full font-title text-xs uppercase tracking-wider !text-black"
+                                            />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     {/if}
                 </div>
             </div>

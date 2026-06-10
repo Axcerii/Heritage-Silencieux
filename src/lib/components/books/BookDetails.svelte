@@ -540,7 +540,7 @@
                                             ></div>
                                         </div>
                                     </div>
-                                    {/each}
+                                {/each}
                             </div>
                         {/if}
                     </div>
@@ -549,184 +549,179 @@
         </div>
     {:else}
         <!-- Administration view -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 font-text">
-            <!-- Left Side: Modify Book Info & Danger Zone -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Edit Book details card -->
-                <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
-                    <h3 class="text-xl font-title text-secondary tracking-wider border-b border-gray-800 pb-2">Modifier l'ouvrage</h3>
-                    
-                    <form onsubmit={handleUpdateBook} class="grid grid-cols-1 md:grid-cols-5 gap-6">
-                        <!-- Left pane (fields) -->
-                        <div class="space-y-4 md:col-span-3">
-                            <div>
-                                <label for="edit-title" class="block text-xs font-text text-gray-300 mb-1">Titre du grimoire</label>
-                                <input 
-                                    type="text" 
-                                    id="edit-title" 
-                                    bind:value={editTitle}
-                                    required
-                                    class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
-                                />
-                            </div>
-
-                            <div>
-                                <label for="edit-author" class="block text-xs font-text text-gray-300 mb-1">Auteur</label>
-                                <input 
-                                    type="text" 
-                                    id="edit-author" 
-                                    bind:value={editAuthor}
-                                    required
-                                    class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
-                                />
-                            </div>
-
-                            <div>
-                                <label for="edit-genre" class="block text-xs font-text text-gray-300 mb-1">Genre</label>
-                                <input 
-                                    type="text" 
-                                    id="edit-genre" 
-                                    bind:value={editGenre}
-                                    required
-                                    class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
-                                />
-                            </div>
+        <div class="space-y-6 font-text max-w-4xl mx-auto">
+            <!-- Edit Book details card -->
+            <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
+                <h3 class="text-xl font-title text-secondary tracking-wider border-b border-gray-800 pb-2">Modifier l'ouvrage</h3>
+                
+                <form onsubmit={handleUpdateBook} class="grid grid-cols-1 md:grid-cols-5 gap-6">
+                    <!-- Left pane (fields) -->
+                    <div class="space-y-4 md:col-span-3">
+                        <div>
+                            <label for="edit-title" class="block text-xs font-text text-gray-300 mb-1">Titre du grimoire</label>
+                            <input 
+                                type="text" 
+                                id="edit-title" 
+                                bind:value={editTitle}
+                                required
+                                class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
+                            />
                         </div>
 
-                        <!-- Right pane (dragon checkboxes grid) -->
-                        <div class="md:col-span-2 flex flex-col justify-between space-y-6">
-                            <div>
-                                <span class="block text-xs font-text text-gray-300 mb-2">Thème Dragon (optionnel)</span>
-                                <div class="grid grid-cols-4 gap-1.5">
-                                    {#each DRAGON_THEMES as theme}
-                                        {@const isActive = editTheme === theme.name}
-                                        <button
-                                            type="button"
-                                            title={theme.name}
-                                            onclick={() => {
-                                                if (editTheme === theme.name) {
-                                                    editTheme = '';
-                                                } else {
-                                                    editTheme = theme.name;
-                                                }
-                                            }}
-                                            class="relative flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all cursor-pointer select-none h-11 {isActive ? `${theme.border} bg-background/80 shadow-[0_0_12px_rgba(255,255,255,0.05)]` : 'bg-background/40 border-gray-850 hover:border-gray-750'}"
-                                            style={isActive ? `border-color: var(--color-${theme.name}); box-shadow: 0 0 10px var(--color-${theme.name}33);` : ''}
-                                        >
-                                            <!-- Checkbox Indicator -->
-                                            <div class="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-sm border flex items-center justify-center {isActive ? `${theme.bg} border-transparent text-black` : 'border-gray-850 bg-transparent'}">
-                                                {#if isActive}
-                                                    <svg class="w-1.5 h-1.5 fill-current text-background" viewBox="0 0 20 20">
-                                                        <path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/>
-                                                    </svg>
-                                                {/if}
-                                            </div>
-
-                                            <!-- Logo -->
-                                            <div class="w-6 h-6 flex items-center justify-center">
-                                                <img src={theme.logo} alt={theme.name} class="w-full h-full object-contain {theme.svgFilter} {isActive ? '' : 'opacity-60'}" />
-                                            </div>
-                                        </button>
-                                    {/each}
-                                </div>
-                            </div>
-
-                            <!-- Save / Success Area -->
-                            <div class="space-y-3 pt-4 border-t border-gray-800/80">
-                                {#if updateBookError}
-                                    <p class="text-xs text-Chronos">{updateBookError}</p>
-                                {/if}
-
-                                {#if updateBookSuccess}
-                                    <p class="text-xs text-Guizamark">Le grimoire a été mis à jour avec succès.</p>
-                                {/if}
-
-                                <Cta 
-                                    type="submit"
-                                    disabled={updatingBook}
-                                    text={updatingBook ? 'Enregistrement...' : 'Enregistrer'}
-                                    dragon="Pura"
-                                    border="Pura"
-                                    class="h-10 w-full font-title text-xs uppercase tracking-wider !text-black"
-                                />
-                            </div>
+                        <div>
+                            <label for="edit-author" class="block text-xs font-text text-gray-300 mb-1">Auteur</label>
+                            <input 
+                                type="text" 
+                                id="edit-author" 
+                                bind:value={editAuthor}
+                                required
+                                class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
+                            />
                         </div>
-                    </form>
-                </div>
 
-                <!-- Danger Zone card -->
-                <div class="border border-Chronos/30 bg-Chronos/5 p-6 rounded-lg space-y-4">
-                    <h3 class="text-xl font-title text-Chronos tracking-wider border-b border-Chronos/10 pb-2">Zone de Danger</h3>
-                    <p class="text-xs text-gray-400 leading-relaxed">
-                        La destruction de cet ouvrage est définitive. Tous les chapitres rédigés ainsi que les critiques et progressions associées seront définitivement perdus.
-                    </p>
-                    {#if deleteBookError}
-                        <p class="text-xs text-Chronos">{deleteBookError}</p>
-                    {/if}
-                    <Cta 
-                        onClick={handleDeleteBook}
-                        disabled={deletingBook}
-                        text={deletingBook ? 'Destruction...' : 'Détruire le grimoire'}
-                        dragon="Chronos"
-                        border="Chronos"
-                        class="h-10 text-xs uppercase tracking-wider text-white font-title"
-                    />
-                </div>
-            </div>
-
-            <!-- Right Side: Chapters administration -->
-            <div class="lg:col-span-1 space-y-6">
-                <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
-                    <div class="flex justify-between items-center border-b border-gray-800 pb-2">
-                        <h3 class="text-xl font-title text-secondary tracking-wider">Gestion des Chapitres</h3>
-                        <Cta 
-                            text="Écrire un Chapitre"
-                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
-                            dragon="Pura"
-                            border="Pura"
-                            class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
-                        />
+                        <div>
+                            <label for="edit-genre" class="block text-xs font-text text-gray-300 mb-1">Genre</label>
+                            <input 
+                                type="text" 
+                                id="edit-genre" 
+                                bind:value={editGenre}
+                                required
+                                class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
+                            />
+                        </div>
                     </div>
 
-                    {#if loadingChapters}
-                        <div class="space-y-3">
-                            <div class="h-10 bg-gray-800/40 animate-pulse rounded"></div>
-                            <div class="h-10 bg-gray-800/40 animate-pulse rounded"></div>
+                    <!-- Right pane (dragon checkboxes grid) -->
+                    <div class="md:col-span-2 flex flex-col justify-between space-y-6">
+                        <div>
+                            <span class="block text-xs font-text text-gray-300 mb-2">Thème Dragon (optionnel)</span>
+                            <div class="grid grid-cols-4 gap-1.5">
+                                {#each DRAGON_THEMES as theme}
+                                    {@const isActive = editTheme === theme.name}
+                                    <button
+                                        type="button"
+                                        title={theme.name}
+                                        onclick={() => {
+                                            if (editTheme === theme.name) {
+                                                editTheme = '';
+                                            } else {
+                                                editTheme = theme.name;
+                                            }
+                                        }}
+                                        class="relative flex flex-col items-center justify-center p-1 rounded-lg border text-center transition-all cursor-pointer select-none h-11 {isActive ? `${theme.border} bg-background/80 shadow-[0_0_12px_rgba(255,255,255,0.05)]` : 'bg-background/40 border-gray-850 hover:border-gray-750'}"
+                                        style={isActive ? `border-color: var(--color-${theme.name}); box-shadow: 0 0 10px var(--color-${theme.name}33);` : ''}
+                                    >
+                                        <!-- Checkbox Indicator -->
+                                        <div class="absolute top-0.5 right-0.5 w-2.5 h-2.5 rounded-sm border flex items-center justify-center {isActive ? `${theme.bg} border-transparent text-black` : 'border-gray-850 bg-transparent'}">
+                                            {#if isActive}
+                                                <svg class="w-1.5 h-1.5 fill-current text-background" viewBox="0 0 20 20">
+                                                    <path d="M0 11l2-2 5 5L18 3l2 2L7 18z"/>
+                                                </svg>
+                                            {/if}
+                                        </div>
+
+                                        <!-- Logo -->
+                                        <div class="w-6 h-6 flex items-center justify-center">
+                                            <img src={theme.logo} alt={theme.name} class="w-full h-full object-contain {theme.svgFilter} {isActive ? '' : 'opacity-60'}" />
+                                        </div>
+                                    </button>
+                                {/each}
+                            </div>
                         </div>
-                    {:else if chapters.length === 0}
-                        <div class="text-center py-10 text-gray-500 text-sm">
-                            Aucun chapitre n'a encore été rédigé.
+
+                        <!-- Save / Success Area -->
+                        <div class="space-y-3 pt-4 border-t border-gray-800/80">
+                            {#if updateBookError}
+                                <p class="text-xs text-Chronos">{updateBookError}</p>
+                            {/if}
+
+                            {#if updateBookSuccess}
+                                <p class="text-xs text-Guizamark">Le grimoire a été mis à jour avec succès.</p>
+                            {/if}
+
+                            <Cta 
+                                type="submit"
+                                disabled={updatingBook}
+                                text={updatingBook ? 'Enregistrement...' : 'Enregistrer'}
+                                dragon="Pura"
+                                border="Pura"
+                                class="h-10 w-full font-title text-xs uppercase tracking-wider !text-black"
+                            />
                         </div>
-                    {:else}
-                        <div class="divide-y divide-gray-800/60 max-h-[500px] overflow-y-auto pr-2">
-                            {#each chapters as chapter (chapter.id)}
-                                <div class="py-3 flex justify-between items-center group">
-                                    <div>
-                                        <span class="text-xs text-secondary font-title tracking-wider mr-3">INDEX {chapter.index}</span>
-                                        <span class="text-sm text-gray-200 group-hover:text-secondary transition-colors font-semibold">{chapter.title}</span>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <Cta 
-                                            text="Modifier"
-                                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write?index=${chapter.index}`)}
-                                            dragon="none"
-                                            border="Pura"
-                                            class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-secondary border border-secondary/30 hover:bg-secondary/10"
-                                        />
-                                        <Cta 
-                                            text={deletingChapters[chapter.index] ? 'Suppression...' : 'Supprimer'}
-                                            onClick={() => handleDeleteChapter(chapter.index, chapter.title)}
-                                            disabled={deletingChapters[chapter.index]}
-                                            dragon="none"
-                                            border="Chronos"
-                                            class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-Chronos border border-Chronos/30 hover:bg-Chronos/10"
-                                        />
-                                    </div>
-                                </div>
-                            {/each}
-                        </div>
-                    {/if}
+                    </div>
+                </form>
+            </div>
+
+            <!-- Chapters administration -->
+            <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
+                <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                    <h3 class="text-xl font-title text-secondary tracking-wider">Gestion des Chapitres</h3>
+                    <Cta 
+                        text="Écrire un Chapitre"
+                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
+                    />
                 </div>
+
+                {#if loadingChapters}
+                    <div class="space-y-3">
+                        <div class="h-10 bg-gray-800/40 animate-pulse rounded"></div>
+                        <div class="h-10 bg-gray-800/40 animate-pulse rounded"></div>
+                    </div>
+                {:else if chapters.length === 0}
+                    <div class="text-center py-10 text-gray-500 text-sm">
+                        Aucun chapitre n'a encore été rédigé.
+                    </div>
+                {:else}
+                    <div class="divide-y divide-gray-800/60 max-h-[500px] overflow-y-auto pr-2">
+                        {#each chapters as chapter (chapter.id)}
+                            <div class="py-3 flex justify-between items-center group">
+                                <div>
+                                    <span class="text-xs text-secondary font-title tracking-wider mr-3">INDEX {chapter.index}</span>
+                                    <span class="text-sm text-gray-200 group-hover:text-secondary transition-colors font-semibold">{chapter.title}</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <Cta 
+                                        text="Modifier"
+                                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write?index=${chapter.index}`)}
+                                        dragon="none"
+                                        border="Pura"
+                                        class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-secondary border border-secondary/30 hover:bg-secondary/10"
+                                    />
+                                    <Cta 
+                                        text={deletingChapters[chapter.index] ? 'Suppression...' : 'Supprimer'}
+                                        onClick={() => handleDeleteChapter(chapter.index, chapter.title)}
+                                        disabled={deletingChapters[chapter.index]}
+                                        dragon="none"
+                                        border="Chronos"
+                                        class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-Chronos border border-Chronos/30 hover:bg-Chronos/10"
+                                    />
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            </div>
+
+            <!-- Danger Zone card -->
+            <div class="border border-Chronos/30 bg-Chronos/5 p-6 rounded-lg space-y-4">
+                <h3 class="text-xl font-title text-Chronos tracking-wider border-b border-Chronos/10 pb-2">Zone de Danger</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">
+                    La destruction de cet ouvrage est définitive. Tous les chapitres rédigés ainsi que les critiques et progressions associées seront définitivement perdus.
+                </p>
+                {#if deleteBookError}
+                    <p class="text-xs text-Chronos">{deleteBookError}</p>
+                {/if}
+                <Cta 
+                    onClick={handleDeleteBook}
+                    disabled={deletingBook}
+                    text={deletingBook ? 'Destruction...' : 'Détruire le grimoire'}
+                    dragon="Chronos"
+                    border="Chronos"
+                    class="h-10 text-xs uppercase tracking-wider text-white font-title"
+                />
             </div>
         </div>
     {/if}
