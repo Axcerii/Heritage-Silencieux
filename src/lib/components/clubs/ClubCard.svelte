@@ -17,10 +17,15 @@
         { name: 'Drii', color: 'text-Drii', bg: 'bg-Drii', border: 'border-Drii/30', hoverBorder: 'hover:border-Drii', shadow: 'hover:shadow-[0_0_20px_rgba(128,48,132,0.25)]', logo: '/dragons_logos/normal/Drii.svg', svgFilter: 'Drii-svg' },
         { name: 'Lada', color: 'text-Lada', bg: 'bg-Lada', border: 'border-Lada/30', hoverBorder: 'hover:border-Lada', shadow: 'hover:shadow-[0_0_20px_rgba(243,240,158,0.25)]', logo: '/dragons_logos/normal/Lada.svg', svgFilter: 'Lada-svg' },
         { name: 'Pura', color: 'text-Pura', bg: 'bg-Pura', border: 'border-Pura/30', hoverBorder: 'hover:border-Pura', shadow: 'hover:shadow-[0_0_20px_rgba(210,182,116,0.25)]', logo: '/dragons_logos/normal/Pura.svg', svgFilter: 'Pura-svg' },
-        { name: 'Artrish', color: 'text-Artrish', bg: 'bg-Artrish', border: 'border-Artrish/30', hoverBorder: 'hover:border-Artrish', shadow: 'hover:shadow-[0_0_20px_rgba(255,255,255,0.15)]', logo: '/dragons_logos/normal/Artrish.svg', svgFilter: 'Artrish-svg' }
+        { name: 'Artrish', color: 'text-Artrish', bg: 'bg-Artrish', border: 'border-Artrish/30', hoverBorder: 'hover:border-Artrish', shadow: 'hover:shadow-[0_0_20px_rgba(255,255,255,0.15)]', logo: '/dragons_logos/normal/Artrish.svg', svgFilter: 'Artrish-svg' },
+        { name: 'Shizari', color: 'text-secondary', bg: 'bg-Shizari', border: 'border-Shizari/30', hoverBorder: 'hover:border-Shizari', shadow: 'hover:shadow-[0_0_20px_rgba(27,27,27,0.45)]', logo: '/dragons_logos/normal/Shizari.svg', svgFilter: 'Shizari-svg' }
     ];
 
-    function getTheme(slug: string) {
+    function getTheme(slug: string, explicitTheme?: string) {
+        if (explicitTheme) {
+            const found = DRAGON_THEMES.find(t => t.name === explicitTheme);
+            if (found) return found;
+        }
         if (slug.includes('classiques')) {
             return DRAGON_THEMES.find(t => t.name === 'Pura')!;
         }
@@ -39,7 +44,7 @@
         return DRAGON_THEMES[index];
     }
 
-    const theme = $derived(getTheme(club.slug));
+    const theme = $derived(getTheme(club.slug, club.theme));
 </script>
 
 <button 

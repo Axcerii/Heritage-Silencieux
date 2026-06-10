@@ -222,7 +222,7 @@
         </header>
 
         <!-- Main Content Area -->
-        <main class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden z-10 flex flex-col relative">
+        <main class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative">
             {@render children()}
         </main>
 

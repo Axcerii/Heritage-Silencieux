@@ -17,10 +17,15 @@
         { name: 'Drii', logo: '/dragons_logos/normal/Drii.svg', svgFilter: 'Drii-svg' },
         { name: 'Lada', logo: '/dragons_logos/normal/Lada.svg', svgFilter: 'Lada-svg' },
         { name: 'Pura', logo: '/dragons_logos/normal/Pura.svg', svgFilter: 'Pura-svg' },
-        { name: 'Artrish', logo: '/dragons_logos/normal/Artrish.svg', svgFilter: 'Artrish-svg' }
+        { name: 'Artrish', logo: '/dragons_logos/normal/Artrish.svg', svgFilter: 'Artrish-svg' },
+        { name: 'Shizari', logo: '/dragons_logos/normal/Shizari.svg', svgFilter: 'Shizari-svg' }
     ];
 
-    function getTheme(genre: string) {
+    function getTheme(genre: string, explicitTheme?: string) {
+        if (explicitTheme) {
+            const found = DRAGON_THEMES.find(t => t.name === explicitTheme);
+            if (found) return found;
+        }
         const normalized = genre.toLowerCase().trim();
         
         if (normalized.includes('science-fiction') || normalized.includes('sf') || normalized.includes('dystopie') || normalized.includes('cyberpunk') || normalized.includes('yinva')) {
@@ -63,7 +68,7 @@
         return DRAGON_THEMES[index];
     }
 
-    const theme = $derived(getTheme(book.genre));
+    const theme = $derived(getTheme(book.genre, book.theme));
 
     function renderStars(rating: number | null) {
         if (rating === null) return '';
