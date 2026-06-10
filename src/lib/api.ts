@@ -71,14 +71,12 @@ export interface Progression {
 }
 
 export interface MemberProgression {
-    id: string;
     userId: string;
-    bookId: string;
+    userName: string | null;
+    userEmail: string;
     currentPage: number;
-    user: {
-        id: string;
-        name: string | null;
-    };
+    progressPercentage: number;
+    updatedAt: string | null;
 }
 
 async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {

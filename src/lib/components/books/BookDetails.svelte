@@ -58,11 +58,23 @@
         }
     });
 
-    // Review form inputs
+    // Review form inputs & derived states
     let newReviewRating = $state(5);
     let newReviewComment = $state('');
     let submittingReview = $state(false);
     let reviewError = $state<string | null>(null);
+
+    // Derive user's own review
+    const myReview = $derived(reviews.find(r => r.userId === session.user.id));
+
+    // Calculate dynamic average rating based on current reviews in state
+    const averageRating = $derived(
+        reviews.length > 0
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+            : null
+    );
+
+
 
     // Chapter form inputs (Redirected to write page)
 
@@ -154,6 +166,11 @@
         // Reviews
         try {
             reviews = await getReviews(clubSlug, book.id);
+            const existingReview = reviews.find(r => r.userId === session.user.id);
+            if (existingReview) {
+                newReviewRating = existingReview.rating;
+                newReviewComment = existingReview.comment || '';
+            }
         } catch (e) {
             console.error('Failed to load reviews:', e);
         } finally {
@@ -216,7 +233,6 @@
                     ...reviews
                 ];
             }
-            newReviewComment = '';
         } catch (e: any) {
             reviewError = e.message || 'Erreur lors de la soumission de la critique.';
         } finally {
@@ -229,6 +245,12 @@
         try {
             await deleteReviewAdmin(reviewId);
             reviews = reviews.filter(r => r.id !== reviewId);
+            // Reset form if the user's own review was deleted by admin moderation
+            const hasMyReview = reviews.some(r => r.userId === session.user.id);
+            if (!hasMyReview) {
+                newReviewRating = 5;
+                newReviewComment = '';
+            }
         } catch (e: any) {
             alert('Erreur lors de la suppression: ' + e.message);
         }
@@ -274,7 +296,7 @@
         <div class="bg-background/60 border border-secondary/20 p-4 rounded-lg flex flex-col justify-center sm:text-right min-w-[150px]">
             <span class="text-[10px] uppercase text-gray-400 font-text tracking-widest">Note Moyenne</span>
             <span class="text-2xl text-secondary font-title mt-1">
-                {book.averageRating !== null ? `${book.averageRating.toFixed(1)} / 5` : 'N/A'}
+                {averageRating !== null ? `${averageRating.toFixed(1)} / 5` : 'N/A'}
             </span>
             <span class="text-xs text-gray-500 font-text mt-0.5">{reviews.length} critiques</span>
         </div>
@@ -389,7 +411,7 @@
 
                     <!-- Write review form -->
                     <form onsubmit={handleAddReview} class="bg-background/40 border border-gray-800 p-5 rounded-lg space-y-4">
-                        <h4 class="text-sm font-title text-white uppercase tracking-wider">Laisser une critique</h4>
+                        <h4 class="text-sm font-title text-white uppercase tracking-wider">{myReview ? 'Modifier votre critique' : 'Laisser une critique'}</h4>
                         
                         <div class="flex items-center space-x-4">
                             <span class="text-xs font-text text-gray-400">Votre note :</span>
@@ -422,7 +444,7 @@
                         <Cta 
                             type="submit" 
                             disabled={submittingReview}
-                            text={submittingReview ? 'Envoi...' : 'Publier la critique'}
+                            text={submittingReview ? 'Envoi...' : (myReview ? 'Modifier la critique' : 'Publier la critique')}
                             dragon="Pura"
                             border="Pura"
                             class="h-10 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
@@ -448,6 +470,9 @@
                                                 </div>
                                             {/if}
                                             <span class="text-xs text-gray-300 font-semibold">{review.user.name || 'Utilisateur anonyme'}</span>
+                                            {#if review.userId === session.user.id}
+                                                <span class="px-2 py-0.5 rounded bg-secondary/20 text-secondary text-[10px] uppercase font-bold tracking-wider">Votre critique</span>
+                                            {/if}
                                         </div>
                                         <span class="text-secondary text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
                                     </div>
@@ -488,7 +513,7 @@
                                 {#each globalProgressions as memberProg}
                                     <div class="space-y-1">
                                         <div class="flex justify-between text-xs">
-                                            <span class="text-gray-300 font-semibold">{memberProg.user.name || 'Anonyme'}</span>
+                                            <span class="text-gray-300 font-semibold">{memberProg.userName || 'Anonyme'}</span>
                                             <span class="text-secondary">{memberProg.currentPage} / {chapters.length} chap.</span>
                                         </div>
                                         <div class="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
