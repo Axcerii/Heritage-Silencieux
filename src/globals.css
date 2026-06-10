@@ -6,7 +6,7 @@
     --color-Artrish: #fff;
     --color-Yinva: #E5B8CC;
     --color-Guizamark: #CFDFC4;
-    --color-Shizari: #1b1b1b;
+    --color-Shizari: #000;
     --color-Pestia: #615DD3;
     --color-Chronos: #CA4444;
     --color-Aqua: #a6a6a6;
@@ -67,7 +67,7 @@ html {
 }
 
 .Shizari-svg {
-    filter: invert(0%) sepia(53%) saturate(56%) hue-rotate(332deg) brightness(113%) contrast(79%);
+    filter: invert(0%);
 }
 
 .Pestia-svg {
@@ -109,6 +109,7 @@ input {
     box-sizing: border-box;
     padding: 0 1rem;
     transition: all 0.2s ease-in-out;
+    color: black;
 }
 
 @media (min-width: 640px) {

@@ -1,5 +1,6 @@
 export const BACKEND_BASE = 'http://localhost:3000';
 
+export type DragonTheme = 'Aqua' | 'Artrish' | 'Chronos' | 'Drii' | 'Goliath' | 'Guizamark' | 'Lada' | 'Pestia' | 'Pura' | 'Shizari' | 'Yinva';
 
 export interface Club {
     id: string;
@@ -7,6 +8,7 @@ export interface Club {
     slug: string;
     isActive: boolean;
     isPublic: boolean;
+    theme?: DragonTheme;
 }
 
 export interface Book {
@@ -20,6 +22,7 @@ export interface Book {
     createdAt: string;
     updatedAt: string;
     averageRating: number | null;
+    theme?: DragonTheme;
 }
 
 export interface ClubMember {
@@ -115,14 +118,14 @@ export function getClubDetails(clubId: string): Promise<Club> {
     return apiRequest<Club>(`/clubs/${clubId}`);
 }
 
-export function createClub(name: string, slug?: string, isPublic?: boolean): Promise<Club> {
+export function createClub(name: string, slug?: string, isPublic?: boolean, theme?: DragonTheme): Promise<Club> {
     return apiRequest<Club>('/clubs', {
         method: 'POST',
-        body: JSON.stringify({ name, slug, isPublic })
+        body: JSON.stringify({ name, slug, isPublic, theme })
     });
 }
 
-export function updateClub(clubId: string, data: { name?: string; slug?: string; isActive?: boolean; isPublic?: boolean }): Promise<Club> {
+export function updateClub(clubId: string, data: { name?: string; slug?: string; isActive?: boolean; isPublic?: boolean; theme?: DragonTheme }): Promise<Club> {
     return apiRequest<Club>(`/clubs/${clubId}`, {
         method: 'PATCH',
         body: JSON.stringify(data)
@@ -196,14 +199,14 @@ export function getBookDetails(clubSlug: string, bookId: string): Promise<Book> 
     return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`);
 }
 
-export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages?: number }): Promise<Book> {
+export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages?: number; theme?: DragonTheme }): Promise<Book> {
     return apiRequest<Book>(`/clubs/${clubSlug}/books`, {
         method: 'POST',
         body: JSON.stringify(data)
     });
 }
 
-export function updateBook(clubSlug: string, bookId: string, data: { title?: string; author?: string; genre?: string; pages?: number; isActive?: boolean }): Promise<Book> {
+export function updateBook(clubSlug: string, bookId: string, data: { title?: string; author?: string; genre?: string; pages?: number; isActive?: boolean; theme?: DragonTheme }): Promise<Book> {
     return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`, {
         method: 'PATCH',
         body: JSON.stringify(data)
