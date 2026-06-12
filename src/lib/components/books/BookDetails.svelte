@@ -32,7 +32,7 @@
     let loadingProgression = $state(true);
 
     // Admin tab states
-    let activeTab = $state<'details' | 'admin'>('details');
+    let activeTab = $state<'lecture' | 'critique' | 'admin'>('lecture');
 
     // Book edit form inputs
     let editTitle = $state(book.title);
@@ -285,16 +285,122 @@
     );
 </script>
 
-<div class="w-full max-w-5xl mx-auto p-4 sm:p-6 space-y-8">
+{#if userRole !== null}
+    <!-- Sidebar on Desktop (viewport fixed on left) -->
+    <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto">
+        <!-- Back Button to Club/Library -->
+        <button 
+            onclick={onBack}
+            class="flex items-center justify-center gap-2 font-title text-sm tracking-wider text-secondary hover:text-white hover:underline rounded transition-all duration-200 cursor-pointer bg-transparent border-0 outline-none"
+        >
+            ← Retour au cercle
+        </button>
+
+        <div class="space-y-2">
+            <span class="text-xs font-text uppercase tracking-widest text-gray-400">Sections</span>
+            <nav class="flex flex-col gap-2">
+                <button 
+                    onclick={() => activeTab = 'lecture'}
+                    class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeTab === 'lecture' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
+                >
+                    <img src="/dragons_logos/normal/Lada.svg" alt="" class="w-8 h-8 secondary-svg">
+                    Lecture
+                </button>
+                <button 
+                    onclick={() => activeTab = 'critique'}
+                    class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeTab === 'critique' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
+                >
+                    <img src="/dragons_logos/normal/Pestia.svg" alt="" class="w-8 h-8 secondary-svg">
+                    Critique
+                </button>
+                {#if canManageChapters}
+                    <button 
+                        onclick={() => activeTab = 'admin'}
+                        class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeTab === 'admin' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
+                    >
+                        <img src="/dragons_logos/normal/Yinva.svg" alt="" class="w-8 h-8 secondary-svg">
+                        Admin
+                    </button>
+                {/if}
+            </nav>
+        </div>
+
+        {#if activeTab === 'lecture' && canManageChapters}
+            <div class="space-y-3 pt-4 border-t border-secondary/20">
+                <span class="text-xs font-text uppercase tracking-widest text-gray-400">Actions</span>
+                <div class="flex flex-col gap-2">
+                    <Cta 
+                        text="Écrire un Chapitre"
+                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-9 px-4 font-title text-[13px] uppercase tracking-wider !text-black w-full flex items-center justify-center cursor-pointer"
+                    />
+                </div>
+            </div>
+        {/if}
+    </aside>
+{/if}
+
+<div class="w-full {userRole !== null ? 'space-y-8' : 'max-w-5xl mx-auto p-4 sm:p-6 space-y-8'}">
+    {#if userRole !== null}
+        <!-- Mobile Actions / Tabs (Mobile Only) -->
+        <div class="md:hidden w-full flex items-center justify-between border-b border-gray-800 pb-2 gap-4">
+            <div class="flex items-center gap-2">
+                <button 
+                    onclick={onBack}
+                    class="w-8 h-8 mr-4 text-secondary font-title text-lg border border-secondary/35 bg-secondary/15 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0 hover:bg-secondary/25 active:scale-95 duration-200 outline-none"
+                >
+                    ←
+                </button>
+                
+                <div class="flex gap-0.5 border-b border-transparent">
+                    <button 
+                        onclick={() => activeTab = 'lecture'}
+                        class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'lecture' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                    >
+                        Lecture
+                    </button>
+                    <button 
+                        onclick={() => activeTab = 'critique'}
+                        class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'critique' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                    >
+                        Critique
+                    </button>
+                    {#if canManageChapters}
+                        <button 
+                            onclick={() => activeTab = 'admin'}
+                            class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                        >
+                            Admin
+                        </button>
+                    {/if}
+                </div>
+            </div>
+
+            {#if activeTab === 'lecture' && canManageChapters}
+                <div>
+                    <Cta 
+                        text="Écrire"
+                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                        dragon="Pura"
+                        border="Pura"
+                        class="h-8 px-3 font-title text-xs uppercase tracking-wider !text-black flex items-center justify-center cursor-pointer"
+                    />
+                </div>
+            {/if}
+        </div>
+    {/if}
+
     <!-- Back Button & Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-gray-800 pb-6">
         <div>
-            <button onclick={onBack} class="text-secondary font-title text-sm tracking-wider hover:underline mb-2 block cursor-pointer">
+            <button onclick={onBack} class="{userRole !== null ? 'hidden md:block' : 'block'} text-secondary font-title text-sm tracking-wider hover:underline mb-2 cursor-pointer bg-transparent border-0 outline-none">
                 ← Retour à la bibliothèque
             </button>
             <h1 class="text-3xl sm:text-4xl font-title text-white leading-tight">{book.title}</h1>
             <p class="text-gray-400 font-text italic">par {book.author} — <span class="text-secondary">{book.genre}</span></p>
-            {#if !loadingChapters && chapters.length > 0}
+            {#if activeTab === 'lecture' && !loadingChapters && chapters.length > 0}
                 <div class="mt-4">
                     <Cta 
                         text={readChaptersCount > 0 ? (readChaptersCount === chapters.length ? "Recommencer la lecture" : "Continuer la lecture") : "Commencer la lecture"}
@@ -319,36 +425,17 @@
         </div>
     </div>
 
-    {#if canManageChapters}
-        <div class="flex border-b border-gray-800">
-            <button 
-                onclick={() => activeTab = 'details'}
-                class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'details' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
-            >
-                Lecture & Critiques
-            </button>
-            <button 
-                onclick={() => activeTab = 'admin'}
-                class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
-            >
-                Administration
-            </button>
-        </div>
-    {/if}
-
-    {#if activeTab === 'details' || !canManageChapters}
+    {#if activeTab === 'lecture'}
         <!-- Reading Progress Tracker -->
         <div class="bg-background/80 border border-gray-800 p-6 rounded-lg space-y-4">
-            <h3 class="text-lg font-title text-secondary tracking-wider">Votre Grimoire & Progression</h3>
             
             {#if loadingProgression || loadingChapters}
                 <div class="h-6 bg-gray-800/40 animate-pulse rounded"></div>
             {:else}
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-4 font-text">
-                    <div class="flex items-center space-x-3 w-full sm:w-auto">
-                        <span class="text-sm text-gray-300">Chapitres lus :</span>
-                        <span class="text-white font-semibold font-title text-lg">{readChaptersCount}</span>
-                        <span class="text-sm text-gray-400">sur {chapters.length}</span>
+                    <div class="flex w-full sm:w-auto">
+                        <span class="text-white font-semibold text-lg">{readChaptersCount}</span>
+                        <span class="text-lg text-gray-400">&nbsp;/&nbsp;{chapters.length}</span>
                     </div>
                     <div class="text-sm text-secondary font-title font-bold">
                         {progressPercentage}% Complété
@@ -419,106 +506,12 @@
                         {/each}
                     </div>
                 {/if}
-
-                <!-- Reviews Section -->
-                <div class="space-y-6 pt-6">
-                    <div class="border-b border-gray-850 pb-3">
-                        <h3 class="text-xl font-title text-secondary tracking-wider">Critiques des Initiés</h3>
-                    </div>
-
-                    <!-- Write review form -->
-                    <form onsubmit={handleAddReview} class="bg-background/40 border border-gray-800 p-5 rounded-lg space-y-4">
-                        <h4 class="text-sm font-title text-white uppercase tracking-wider">{myReview ? 'Modifier votre critique' : 'Laisser une critique'}</h4>
-                        
-                        <div class="flex items-center space-x-4">
-                            <span class="text-xs font-text text-gray-400">Votre note :</span>
-                            <div class="flex space-x-1">
-                                {#each Array(5) as _, i}
-                                    <button 
-                                        type="button" 
-                                        onclick={() => newReviewRating = i + 1}
-                                        class="text-xl focus:outline-none cursor-pointer"
-                                    >
-                                        <span class={newReviewRating > i ? 'text-secondary' : 'text-gray-600'}>★</span>
-                                    </button>
-                                {/each}
-                            </div>
-                        </div>
-
-                        <div>
-                            <textarea 
-                                bind:value={newReviewComment}
-                                placeholder="Partagez vos impressions sur cet ouvrage avec le cercle..."
-                                rows="3"
-                                class="w-full bg-primary/20 text-white border border-gray-800 focus:border-secondary p-3 rounded font-text text-sm focus:outline-none focus:ring-0"
-                            ></textarea>
-                        </div>
-
-                        {#if reviewError}
-                            <p class="text-xs text-Chronos font-text">{reviewError}</p>
-                        {/if}
-
-                        <Cta 
-                            type="submit" 
-                            disabled={submittingReview}
-                            text={submittingReview ? 'Envoi...' : (myReview ? 'Modifier la critique' : 'Publier la critique')}
-                            dragon="Pura"
-                            border="Pura"
-                            class="h-10 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
-                        />
-                    </form>
-
-                    <!-- Reviews list -->
-                    {#if loadingReviews}
-                        <div class="h-12 bg-gray-800/40 animate-pulse rounded"></div>
-                    {:else if reviews.length === 0}
-                        <p class="text-sm text-gray-500 font-text italic">Aucune critique n'a encore été publiée.</p>
-                    {:else}
-                        <div class="space-y-4">
-                            {#each reviews as review (review.id)}
-                                <div class="border border-gray-800 bg-background/30 p-4 rounded-lg space-y-2 font-text">
-                                    <div class="flex justify-between items-center">
-                                        <div class="flex items-center space-x-2">
-                                            {#if review.user.image}
-                                                <img src={getImageUrl(review.user.image)} alt="" class="w-6 h-6 rounded-full object-cover" />
-                                            {:else}
-                                                <div class="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs">
-                                                    {review.user.name?.charAt(0) || 'U'}
-                                                </div>
-                                            {/if}
-                                            <span class="text-xs text-gray-300 font-semibold">{review.user.name || 'Utilisateur anonyme'}</span>
-                                            {#if review.userId === session.user.id}
-                                                <span class="px-2 py-0.5 rounded bg-secondary/20 text-secondary text-[10px] uppercase font-bold tracking-wider">Votre critique</span>
-                                            {/if}
-                                        </div>
-                                        <span class="text-secondary text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
-                                    </div>
-                                    {#if review.comment}
-                                        <p class="text-sm text-gray-300 leading-relaxed font-text italic">
-                                            « {review.comment} »
-                                        </p>
-                                    {/if}
-                                    {#if session.user.role === 'ADMIN'}
-                                        <div class="pt-2 flex justify-end">
-                                            <button 
-                                                onclick={() => handleDeleteReviewAdmin(review.id)}
-                                                class="text-xs text-Chronos hover:underline bg-transparent border-0 cursor-pointer"
-                                            >
-                                                Supprimer (Modération)
-                                            </button>
-                                        </div>
-                                    {/if}
-                                </div>
-                            {/each}
-                        </div>
-                    {/if}
-                </div>
             </div>
 
             <!-- Sidebar (Other members' progress) -->
             <div class="space-y-6">
                 {#if canViewGlobalProgress}
-                    <div class="border-b border-gray-850 pb-3">
+                    <div class="border-b border-gray-855 pb-3">
                         <h3 class="text-lg font-title text-secondary tracking-wider">Progression des membres</h3>
                     </div>
 
@@ -547,9 +540,105 @@
                 {/if}
             </div>
         </div>
-    {:else}
+
+    {:else if activeTab === 'critique'}
+        <!-- Reviews Section -->
+        <div class="space-y-6 max-w-4xl">
+            <div class="border-b border-gray-850 pb-3">
+                <h3 class="text-xl font-title text-secondary tracking-wider">Critiques des Initiés</h3>
+            </div>
+
+            <!-- Write review form -->
+            <form onsubmit={handleAddReview} class="bg-background/40 border border-gray-800 p-5 rounded-lg space-y-4">
+                <h4 class="text-sm font-title text-white uppercase tracking-wider">{myReview ? 'Modifier votre critique' : 'Laisser une critique'}</h4>
+                
+                <div class="flex items-center space-x-4">
+                    <span class="text-xs font-text text-gray-400">Votre note :</span>
+                    <div class="flex space-x-1">
+                        {#each Array(5) as _, i}
+                            <button 
+                                type="button" 
+                                onclick={() => newReviewRating = i + 1}
+                                class="text-xl focus:outline-none cursor-pointer bg-transparent border-0"
+                            >
+                                <span class={newReviewRating > i ? 'text-secondary' : 'text-gray-600'}>★</span>
+                            </button>
+                        {/each}
+                    </div>
+                </div>
+
+                <div>
+                    <textarea 
+                        bind:value={newReviewComment}
+                        placeholder="Partagez vos impressions sur cet ouvrage avec le cercle..."
+                        rows="3"
+                        class="w-full bg-primary/20 text-white border border-gray-800 focus:border-secondary p-3 rounded font-text text-sm focus:outline-none focus:ring-0"
+                    ></textarea>
+                </div>
+
+                {#if reviewError}
+                    <p class="text-xs text-Chronos font-text">{reviewError}</p>
+                {/if}
+
+                <Cta 
+                    type="submit" 
+                    disabled={submittingReview}
+                    text={submittingReview ? 'Envoi...' : (myReview ? 'Modifier la critique' : 'Publier la critique')}
+                    dragon="Pura"
+                    border="Pura"
+                    class="h-10 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
+                />
+            </form>
+
+            <!-- Reviews list -->
+            {#if loadingReviews}
+                <div class="h-12 bg-gray-800/40 animate-pulse rounded"></div>
+            {:else if reviews.length === 0}
+                <p class="text-sm text-gray-500 font-text italic">Aucune critique n'a encore été publiée.</p>
+            {:else}
+                <div class="space-y-4">
+                    {#each reviews as review (review.id)}
+                        <div class="border border-gray-800 bg-background/30 p-4 rounded-lg space-y-2 font-text">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center space-x-2">
+                                    {#if review.user.image}
+                                        <img src={getImageUrl(review.user.image)} alt="" class="w-6 h-6 rounded-full object-cover" />
+                                    {:else}
+                                        <div class="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs">
+                                            {review.user.name?.charAt(0) || 'U'}
+                                        </div>
+                                    {/if}
+                                    <span class="text-xs text-gray-300 font-semibold">{review.user.name || 'Utilisateur anonyme'}</span>
+                                    {#if review.userId === session.user.id}
+                                        <span class="px-2 py-0.5 rounded bg-secondary/20 text-secondary text-[10px] uppercase font-bold tracking-wider">Votre critique</span>
+                                    {/if}
+                                </div>
+                                <span class="text-secondary text-sm">{'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}</span>
+                            </div>
+                            {#if review.comment}
+                                <p class="text-sm text-gray-300 leading-relaxed font-text italic">
+                                    « {review.comment} »
+                                </p>
+                            {/if}
+                            {#if session.user.role === 'ADMIN'}
+                                <div class="pt-2 flex justify-end">
+                                    <button 
+                                        onclick={() => handleDeleteReviewAdmin(review.id)}
+                                        class="text-xs text-Chronos hover:underline bg-transparent border-0 cursor-pointer"
+                                    >
+                                        Supprimer (Modération)
+                                    </button>
+                                </div>
+                            {/if}
+                        </div>
+                    {/each}
+                </div>
+            {/if}
+        </div>
+
+    {:else if activeTab === 'admin' && canManageChapters}
         <!-- Administration view -->
-        <div class="space-y-6 font-text max-w-4xl mx-auto">
+        <div class="space-y-6 font-text max-w-4xl">
             <!-- Edit Book details card -->
             <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
                 <h3 class="text-xl font-title text-secondary tracking-wider border-b border-gray-800 pb-2">Modifier l'ouvrage</h3>
