@@ -297,8 +297,8 @@
                                     onclick={() => activeClubTab = 'admin'}
                                     class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeClubTab === 'admin' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
                                 >
-                                    <img src="/dragons_logos/normal/Chronos.svg" alt="" class="w-8 h-8 secondary-svg">
-                                    Administration
+                                    <img src="/dragons_logos/normal/Yinva.svg" alt="" class="w-8 h-8 secondary-svg">
+                                    Admin
                                 </button>
                             {/if}
                         </nav>
@@ -532,8 +532,8 @@
                                                 type="submit"
                                                 disabled={updatingClub}
                                                 text={updatingClub ? 'Enregistrement...' : 'Enregistrer'}
-                                                dragon="Pura"
-                                                border="Pura"
+                                                dragon="Yinva"
+                                                border="Artrish"
                                                 class="h-10 w-full font-title text-xs uppercase tracking-wider !text-black"
                                             />
                                         </div>

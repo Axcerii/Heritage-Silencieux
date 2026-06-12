@@ -144,7 +144,7 @@
                 <div class="flex flex-col sm:flex-row gap-3">
                     <input 
                         type="email" 
-                        placeholder="Adresse email de l'initié..." 
+                        placeholder="Email du membre" 
                         bind:value={inviteEmail}
                         required
                         class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm flex-1"
@@ -152,10 +152,10 @@
                     <Cta 
                         type="submit" 
                         disabled={inviting}
-                        text={inviting ? 'Recrutement...' : 'Ajouter au cercle'}
-                        dragon="Pura"
-                        border="Pura"
-                        class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-black shrink-0"
+                        text={inviting ? 'Recrutement...' : 'Ajouter'}
+                        dragon="Pestia"
+                        border="Lada"
+                        class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-white shrink-0"
                     />
                 </div>
 
