@@ -229,7 +229,7 @@
         <p class="text-center py-8 text-Chronos font-text">{error}</p>
     {:else}
         <!-- Members List -->
-        <div class="border border-gray-800 rounded-lg overflow-hidden bg-background/60">
+        <div class="border border-gray-800 rounded-lg overflow-x-auto bg-background/60">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-gray-800 text-[10px] uppercase tracking-widest text-gray-500 font-text">

@@ -11,6 +11,7 @@
     import { goto } from '$app/navigation';
     import Cta from '../Cta.svelte';
     import { getImageUrl } from '$lib';
+    import { sidebarState } from '../../sidebar.svelte';
 
     let { clubSlug, book = $bindable(), userRole, session, onBack, onReadChapter } = $props<{
         clubSlug: string;
@@ -287,13 +288,13 @@
 
 {#if userRole !== null}
     <!-- Sidebar on Desktop (viewport fixed on left) -->
-    <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto">
+    <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 {sidebarState.isOpen ? 'md:translate-x-0' : 'md:-translate-x-full'}">
         <!-- Back Button to Club/Library -->
         <button 
             onclick={onBack}
-            class="flex items-center justify-center gap-2 font-title text-sm tracking-wider text-secondary hover:text-white hover:underline rounded transition-all duration-200 cursor-pointer bg-transparent border-0 outline-none"
+            class="flex items-center justify-center gap-2 font-title text-sm tracking-wider text-secondary hover:text-white hover:underline rounded transition-all duration-200 cursor-pointer bg-transparent border-0 outline-none mt-8"
         >
-            ← Retour au cercle
+            ← Retour à la bibliothèque
         </button>
 
         <div class="space-y-2">
@@ -332,72 +333,88 @@
                     <Cta 
                         text="Écrire un Chapitre"
                         onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
-                        dragon="Pura"
-                        border="Pura"
+                        dragon="Artrish"
+                        border="Yinva"
                         class="h-9 px-4 font-title text-[13px] uppercase tracking-wider !text-black w-full flex items-center justify-center cursor-pointer"
                     />
                 </div>
             </div>
         {/if}
     </aside>
+
+    <!-- Sidebar Toggle Button (Tablet Drawer Control) -->
+    <button 
+        onclick={() => sidebarState.isOpen = !sidebarState.isOpen}
+        class="hidden md:flex lg:hidden fixed top-[88px] z-20 w-8 h-8 bg-[#1b1b1b]/90 backdrop-blur-md border border-secondary/30 hover:border-secondary/70 text-secondary hover:text-white rounded-full items-center justify-center transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(210,182,116,0.25)] hover:scale-105 active:scale-95 cursor-pointer {sidebarState.isOpen ? 'left-[240px]' : 'left-4'}"
+        title={sidebarState.isOpen ? "Masquer le menu" : "Afficher le menu"}
+    >
+        {#if sidebarState.isOpen}
+            <svg class="w-4.5 h-4.5 text-secondary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+        {:else}
+            <svg class="w-4.5 h-4.5 text-secondary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+        {/if}
+    </button>
 {/if}
 
 <div class="w-full {userRole !== null ? 'space-y-8' : 'max-w-5xl mx-auto p-4 sm:p-6 space-y-8'}">
     {#if userRole !== null}
         <!-- Mobile Actions / Tabs (Mobile Only) -->
-        <div class="md:hidden w-full flex items-center justify-between border-b border-gray-800 pb-2 gap-4">
-            <div class="flex items-center gap-2">
+        <div class="md:hidden w-full flex flex-col gap-3 border-b border-gray-800 pb-2">
+            <!-- Top Row: Back Button & Write CTA -->
+            <div class="flex items-center justify-between w-full">
                 <button 
                     onclick={onBack}
-                    class="w-8 h-8 mr-4 text-secondary font-title text-lg border border-secondary/35 bg-secondary/15 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0 hover:bg-secondary/25 active:scale-95 duration-200 outline-none"
+                    class="w-8 h-8 text-secondary font-title text-lg border border-secondary/35 bg-secondary/15 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0 hover:bg-secondary/25 active:scale-95 duration-200 outline-none"
                 >
                     ←
                 </button>
-                
-                <div class="flex gap-0.5 border-b border-transparent">
-                    <button 
-                        onclick={() => activeTab = 'lecture'}
-                        class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'lecture' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
-                    >
-                        Lecture
-                    </button>
-                    <button 
-                        onclick={() => activeTab = 'critique'}
-                        class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'critique' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
-                    >
-                        Critique
-                    </button>
-                    {#if canManageChapters}
-                        <button 
-                            onclick={() => activeTab = 'admin'}
-                            class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
-                        >
-                            Admin
-                        </button>
-                    {/if}
-                </div>
-            </div>
 
-            {#if activeTab === 'lecture' && canManageChapters}
-                <div>
-                    <Cta 
-                        text="Écrire"
-                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
-                        dragon="Pura"
-                        border="Pura"
-                        class="h-8 px-3 font-title text-xs uppercase tracking-wider !text-black flex items-center justify-center cursor-pointer"
-                    />
-                </div>
-            {/if}
+                {#if activeTab === 'lecture' && canManageChapters}
+                    <div>
+                        <Cta 
+                            text="Écrire"
+                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                            dragon="Artrish"
+                            border="Yinva"
+                            class="h-8 px-3 font-title text-xs uppercase tracking-wider !text-black flex items-center justify-center cursor-pointer"
+                        />
+                    </div>
+                {/if}
+            </div>
+            
+            <!-- Bottom Row: Tabs -->
+            <div class="flex gap-1 overflow-x-auto scrollbar-none flex-nowrap w-full">
+                <button 
+                    onclick={() => activeTab = 'lecture'}
+                    class="flex-1 min-w-[70px] text-center py-2 font-title text-xs uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'lecture' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                >
+                    Lecture
+                </button>
+                <button 
+                    onclick={() => activeTab = 'critique'}
+                    class="flex-1 min-w-[70px] text-center py-2 font-title text-xs uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'critique' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                >
+                    Critique
+                </button>
+                {#if canManageChapters}
+                    <button 
+                        onclick={() => activeTab = 'admin'}
+                        class="flex-1 min-w-[70px] text-center py-2 font-title text-xs uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                    >
+                        Admin
+                    </button>
+                {/if}
+            </div>
         </div>
     {/if}
 
     <!-- Back Button & Header -->
     <div class="flex flex-col sm:flex-row justify-between items-start gap-4 border-b border-gray-800 pb-6">
         <div>
-            <button onclick={onBack} class="{userRole !== null ? 'hidden md:block' : 'block'} text-secondary font-title text-sm tracking-wider hover:underline mb-2 cursor-pointer bg-transparent border-0 outline-none">
-                ← Retour à la bibliothèque
-            </button>
             <h1 class="text-3xl sm:text-4xl font-title text-white leading-tight">{book.title}</h1>
             <p class="text-gray-400 font-text italic">par {book.author} — <span class="text-secondary">{book.genre}</span></p>
             {#if activeTab === 'lecture' && !loadingChapters && chapters.length > 0}
@@ -408,8 +425,8 @@
                             const nextChapter = chapters.find(c => !c.isRead) || chapters[0];
                             onReadChapter(nextChapter);
                         }}
-                        dragon="Pura"
-                        border="Pura"
+                        dragon="Lada"
+                        border="Pestia"
                         class="h-10 w-full sm:w-auto px-6 font-title text-sm uppercase tracking-wider !text-black"
                     />
                 </div>
@@ -427,7 +444,7 @@
 
     {#if activeTab === 'lecture'}
         <!-- Reading Progress Tracker -->
-        <div class="bg-background/80 border border-gray-800 p-6 rounded-lg space-y-4">
+        <div class="bg-background/80 px-6 rounded-lg space-y-4">
             
             {#if loadingProgression || loadingChapters}
                 <div class="h-6 bg-gray-800/40 animate-pulse rounded"></div>
@@ -458,8 +475,8 @@
                         <Cta 
                             text="Écrire un Chapitre"
                             onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
-                            dragon="Pura"
-                            border="Pura"
+                            dragon="Artrish"
+                            border="Yinva"
                             class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
                         />
                     {/if}
@@ -497,8 +514,8 @@
                                     <Cta 
                                         text="Lire"
                                         onClick={() => onReadChapter(chapter)}
-                                        dragon="Pura"
-                                        border="Pura"
+                                        dragon="Lada"
+                                        border="Pestia"
                                         class="h-8 w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
                                     />
                                 </div>
@@ -584,9 +601,9 @@
                     type="submit" 
                     disabled={submittingReview}
                     text={submittingReview ? 'Envoi...' : (myReview ? 'Modifier la critique' : 'Publier la critique')}
-                    dragon="Pura"
-                    border="Pura"
-                    class="h-10 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-black"
+                    dragon="Drii"
+                    border="Chronos"
+                    class="h-10 !w-auto px-4 font-title text-xs uppercase tracking-wider !text-white"
                 />
             </form>
 
@@ -640,7 +657,7 @@
         <!-- Administration view -->
         <div class="space-y-6 font-text max-w-4xl">
             <!-- Edit Book details card -->
-            <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
+            <div class="bg-background/60 border border-gray-800 p-4 sm:p-6 rounded-lg space-y-4">
                 <h3 class="text-xl font-title text-secondary tracking-wider border-b border-gray-800 pb-2">Modifier l'ouvrage</h3>
                 
                 <form onsubmit={handleUpdateBook} class="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -732,8 +749,8 @@
                                 type="submit"
                                 disabled={updatingBook}
                                 text={updatingBook ? 'Enregistrement...' : 'Enregistrer'}
-                                dragon="Pura"
-                                border="Pura"
+                                dragon="Yinva"
+                                border="Artrish"
                                 class="h-10 w-full font-title text-xs uppercase tracking-wider !text-black"
                             />
                         </div>
@@ -742,14 +759,14 @@
             </div>
 
             <!-- Chapters administration -->
-            <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
+            <div class="bg-background/60 border border-gray-800 p-4 sm:p-6 rounded-lg space-y-4">
                 <div class="flex justify-between items-center border-b border-gray-800 pb-2">
                     <h3 class="text-xl font-title text-secondary tracking-wider">Gestion des Chapitres</h3>
                     <Cta 
                         text="Écrire un Chapitre"
                         onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
-                        dragon="Pura"
-                        border="Pura"
+                        dragon="Artrish"
+                        border="Yinva"
                         class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
                     />
                 </div>
@@ -766,12 +783,12 @@
                 {:else}
                     <div class="divide-y divide-gray-800/60 max-h-[500px] overflow-y-auto pr-2">
                         {#each chapters as chapter (chapter.id)}
-                            <div class="py-3 flex justify-between items-center group">
+                            <div class="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 group">
                                 <div>
                                     <span class="text-xs text-secondary font-title tracking-wider mr-3">INDEX {chapter.index}</span>
                                     <span class="text-sm text-gray-200 group-hover:text-secondary transition-colors font-semibold">{chapter.title}</span>
                                 </div>
-                                <div class="flex items-center space-x-2">
+                                <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
                                     <Cta 
                                         text="Modifier"
                                         onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write?index=${chapter.index}`)}
@@ -795,7 +812,7 @@
             </div>
 
             <!-- Danger Zone card -->
-            <div class="border border-Chronos/30 bg-Chronos/5 p-6 rounded-lg space-y-4">
+            <div class="border border-Chronos/30 bg-Chronos/5 p-4 sm:p-6 rounded-lg space-y-4">
                 <h3 class="text-xl font-title text-Chronos tracking-wider border-b border-Chronos/10 pb-2">Zone de Danger</h3>
                 <p class="text-xs text-gray-400 leading-relaxed">
                     La destruction de cet ouvrage est définitive. Tous les chapitres rédigés ainsi que les critiques et progressions associées seront définitivement perdus.

@@ -1,5 +1,6 @@
 <script lang="ts">
     import '../globals.css';
+    import { onMount } from 'svelte';
     import Cta from '$lib/components/Cta.svelte';
     import favicon from '$lib/assets/favicon.svg';
     import AuthPage from '$lib/components/auth/AuthPage.svelte';
@@ -7,6 +8,11 @@
     import { page } from '$app/state';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
     import { censorEmail, getImageUrl } from '$lib';
+    import { sidebarState } from '$lib/sidebar.svelte';
+
+    onMount(() => {
+        sidebarState.init();
+    });
 
     let { data, children } = $props<{
         data: { session: AuthSession | null };
@@ -109,15 +115,14 @@
             <div class="flex items-center space-x-4 min-w-0">
                 <!-- App Title Logo -->
                 <a href="/" class="flex items-center space-x-3 cursor-pointer shrink-0 focus:outline-none">
-                    <img src="/dragons_logos/normal/Artrish.svg" alt="" class="w-8 h-8 secondary-svg" />
-                    <h1 class="text-base font-title text-secondary tracking-widest uppercase hidden md:block select-none">Heritage Silencieux</h1>
+                    <img src="/Heritage_Silencieux_Logo.svg" alt="" class="w-30 secondary-svg" />
                 </a>
 
                 <!-- Divider -->
-                <div class="h-4 w-[1px] bg-gray-800 shrink-0"></div>
+                <div class="hidden md:block h-4 w-[1px] bg-gray-800 shrink-0"></div>
 
                 <!-- Breadcrumbs -->
-                <nav class="flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold min-w-0">
+                <nav class="hidden md:flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold min-w-0">
                     {#each breadcrumbs.items as item, i}
                         {#if i > 0}
                             <span class="text-gray-600 shrink-0">/</span>

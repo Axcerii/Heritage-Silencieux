@@ -108,16 +108,16 @@
     </div>
 
     <!-- Admin Tabs Menu -->
-    <div class="flex border-b border-gray-800">
+    <div class="flex border-b border-gray-800 w-full">
         <button 
             onclick={() => activeTab = 'users'}
-            class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'users' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
+            class="flex-1 sm:flex-initial text-center px-4 sm:px-6 py-2.5 sm:py-3 font-title text-sm sm:text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'users' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
         >
             Initiés ({users.length})
         </button>
         <button 
             onclick={() => activeTab = 'clubs'}
-            class="px-6 py-3 font-title text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'clubs' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
+            class="flex-1 sm:flex-initial text-center px-4 sm:px-6 py-2.5 sm:py-3 font-title text-sm sm:text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'clubs' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
         >
             Cercles ({clubs.length})
         </button>
@@ -135,7 +135,7 @@
             {:else if userError}
                 <p class="text-Chronos font-text">{userError}</p>
             {:else}
-                <div class="border border-gray-800 rounded-lg overflow-hidden bg-background/60">
+                <div class="border border-gray-800 rounded-lg overflow-x-auto bg-background/60">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-gray-800 text-[10px] uppercase tracking-widest text-gray-500 font-text">
@@ -196,7 +196,7 @@
             {:else if clubError}
                 <p class="text-Chronos font-text">{clubError}</p>
             {:else}
-                <div class="border border-gray-800 rounded-lg overflow-hidden bg-background/60">
+                <div class="border border-gray-800 rounded-lg overflow-x-auto bg-background/60">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-gray-800 text-[10px] uppercase tracking-widest text-gray-500 font-text">

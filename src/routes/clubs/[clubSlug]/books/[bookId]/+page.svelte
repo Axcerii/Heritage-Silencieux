@@ -5,6 +5,7 @@
     import type { AuthSession } from '$lib/auth-client';
     import BookDetails from '$lib/components/books/BookDetails.svelte';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
+    import { sidebarState } from '$lib/sidebar.svelte';
 
     let { data } = $props<{
         data: { clubSlug: string; bookId: string; session: AuthSession };
@@ -83,7 +84,7 @@
     </div>
 {:else}
 
-    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null ? 'p-4 sm:p-8 md:pl-72' : 'max-w-6xl mx-auto p-4 sm:p-6'}">
+    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null ? (sidebarState.isOpen ? 'p-4 sm:p-8 md:pl-72 lg:pl-72' : 'p-4 sm:p-8 md:pl-8 lg:pl-72') : 'max-w-6xl mx-auto p-4 sm:p-6'}">
         <BookDetails 
             clubSlug={data.clubSlug}
             {book}
