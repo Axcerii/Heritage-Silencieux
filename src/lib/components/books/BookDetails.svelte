@@ -286,7 +286,7 @@
     );
 </script>
 
-{#if userRole !== null}
+{#if userRole !== null || session.user.role === 'ADMIN'}
     <!-- Sidebar on Desktop (viewport fixed on left) -->
     <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 {sidebarState.isOpen ? 'md:translate-x-0' : 'md:-translate-x-full'}">
         <!-- Back Button to Club/Library -->
@@ -360,8 +360,8 @@
     </button>
 {/if}
 
-<div class="w-full {userRole !== null ? 'space-y-8' : 'max-w-5xl mx-auto p-4 sm:p-6 space-y-8'}">
-    {#if userRole !== null}
+<div class="w-full {userRole !== null || session.user.role === 'ADMIN' ? 'space-y-8' : 'max-w-5xl mx-auto p-4 sm:p-6 space-y-8'}">
+    {#if userRole !== null || session.user.role === 'ADMIN'}
         <!-- Mobile Actions / Tabs (Mobile Only) -->
         <div class="md:hidden w-full flex flex-col gap-3 border-b border-gray-800 pb-2">
             <!-- Top Row: Back Button & Write CTA -->

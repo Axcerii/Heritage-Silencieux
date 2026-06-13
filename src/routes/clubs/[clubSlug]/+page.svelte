@@ -194,21 +194,30 @@
     </div>
 {:else}
 
-    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null ? (sidebarState.isOpen ? 'p-4 sm:p-8 md:pl-72 lg:pl-72' : 'p-4 sm:p-8 md:pl-8 lg:pl-72') : 'max-w-6xl mx-auto p-4 sm:p-6'}">
+    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null || data.session?.user?.role === 'ADMIN' ? (sidebarState.isOpen ? 'p-4 sm:p-8 md:pl-72 lg:pl-72' : 'p-4 sm:p-8 md:pl-8 lg:pl-72') : 'max-w-6xl mx-auto p-4 sm:p-6'}">
         <!-- Club Detail Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-secondary/20 pb-6 gap-4">
             <div>
                 <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">{club.name}</h1>
             </div>
             
-            <div class="flex flex-col sm:items-end">
+            <div class="flex flex-col sm:items-end gap-2">
                 <span class="text-sm font-title uppercase tracking-wider text-secondary mt-1">
                     {data.session?.user?.role === 'ADMIN' ? 'Administrateur' : userRole === 'OWNER' ? 'Propriétaire' : userRole === 'EDITOR' ? 'Éditeur' : userRole === 'READER' ? 'Lecteur' : 'Visiteur'}
                 </span>
+                {#if data.session?.user?.role === 'ADMIN' && userRole === null}
+                    <button 
+                        onclick={handleJoinClub}
+                        disabled={joining}
+                        class="px-3 py-1 text-xs border border-secondary/40 hover:bg-secondary/15 rounded text-secondary hover:text-white transition-all cursor-pointer"
+                    >
+                        {joining ? 'Rejoindre...' : 'Rejoindre la bibliothèque'}
+                    </button>
+                {/if}
             </div>
         </div>
 
-        {#if userRole === null}
+        {#if userRole === null && data.session?.user?.role !== 'ADMIN'}
             <div class="max-w-2xl mx-auto my-12 p-4 sm:p-8 bg-background/40 backdrop-blur-md border border-secondary/30 rounded-lg text-center shadow-xl space-y-6">
                 <div class="absolute w-full top-0 left-0 z-[-1] secondary-svg opacity-20 pointer-events-none">
                     <img src="/Envelope.svg" alt="" class="w-full h-full object-contain primary-svg">
