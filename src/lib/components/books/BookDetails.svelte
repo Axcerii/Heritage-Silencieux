@@ -10,7 +10,7 @@
     import type { AuthSession } from '../../auth-client';
     import { goto } from '$app/navigation';
     import Cta from '../Cta.svelte';
-    import { getImageUrl } from '$lib';
+    import { getImageUrl, getUserAvatarDragon } from '$lib';
     import { sidebarState } from '../../sidebar.svelte';
 
     let { clubSlug, book = $bindable(), userRole, session, onBack, onReadChapter } = $props<{
@@ -621,8 +621,9 @@
                                     {#if review.user.image}
                                         <img src={getImageUrl(review.user.image)} alt="" class="w-6 h-6 rounded-full object-cover" />
                                     {:else}
-                                        <div class="w-6 h-6 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs">
-                                            {review.user.name?.charAt(0) || 'U'}
+                                        {@const avatar = getUserAvatarDragon(review.userId)}
+                                        <div class="w-6 h-6 rounded-full flex items-center justify-center border border-secondary/30 p-0.5 {avatar.bgClass}">
+                                            <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                         </div>
                                     {/if}
                                     <span class="text-xs text-gray-300 font-semibold">{review.user.name || 'Utilisateur anonyme'}</span>

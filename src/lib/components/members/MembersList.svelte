@@ -3,7 +3,7 @@
     import { getClubMembers, addClubMember, updateClubMemberRole, removeClubMember, getJoinRequests, approveJoinRequest, rejectJoinRequest, type ClubMember } from '../../api';
     import type { AuthSession } from '../../auth-client';
     import Cta from '../Cta.svelte';
-    import { censorEmail, getImageUrl } from '$lib';
+    import { censorEmail, getImageUrl, getUserAvatarDragon } from '$lib';
 
     let { clubSlug, userRole, session } = $props<{
         clubSlug: string;
@@ -186,8 +186,9 @@
                                         {#if req.user.image}
                                             <img src={getImageUrl(req.user.image)} alt="" class="w-7 h-7 rounded-full object-cover" />
                                         {:else}
-                                            <div class="w-7 h-7 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs shrink-0">
-                                                {req.user.name?.charAt(0) || 'U'}
+                                            {@const avatar = getUserAvatarDragon(req.userId)}
+                                            <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 border border-secondary/30 p-0.5 {avatar.bgClass}">
+                                                <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                             </div>
                                         {/if}
                                         <div class="min-w-0">
@@ -250,8 +251,9 @@
                                 {#if member.user.image}
                                     <img src={getImageUrl(member.user.image)} alt="" class="w-8 h-8 rounded-full object-cover" />
                                 {:else}
-                                    <div class="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-bold text-sm">
-                                        {member.user.name?.charAt(0) || 'U'}
+                                    {@const avatar = getUserAvatarDragon(member.userId)}
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center border border-secondary/30 p-1 {avatar.bgClass}">
+                                        <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                     </div>
                                 {/if}
                                 <span class="text-white font-semibold">{member.user.name || 'Utilisateur'}</span>

@@ -7,7 +7,7 @@
     import { signOut, type AuthSession } from '$lib/auth-client';
     import { page } from '$app/state';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
-    import { censorEmail, getImageUrl } from '$lib';
+    import { censorEmail, getImageUrl, getUserAvatarDragon } from '$lib';
     import { sidebarState } from '$lib/sidebar.svelte';
 
     onMount(() => {
@@ -151,8 +151,9 @@
                     {#if currentSession.user.image}
                         <img src={getImageUrl(currentSession.user.image)} alt="" class="w-8 h-8 rounded-full object-cover border border-secondary group-hover:border-primary transition-colors" />
                     {:else}
-                        <div class="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-title text-sm font-bold uppercase shrink-0 group-hover:bg-secondary transition-colors">
-                            {currentSession.user.name.charAt(0)}
+                        {@const avatar = getUserAvatarDragon(currentSession.user.id)}
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-secondary group-hover:border-primary transition-all p-1 {avatar.bgClass}">
+                            <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                         </div>
                     {/if}
                     <span class="hidden sm:inline text-sm font-title text-gray-300 group-hover:text-secondary transition-colors truncate max-w-[120px]">{currentSession.user.name}</span>
@@ -177,8 +178,9 @@
                                 {#if currentSession.user.image}
                                     <img src={getImageUrl(currentSession.user.image)} alt="" class="w-full h-full object-cover" />
                                 {:else}
-                                    <div class="w-full h-full bg-primary text-black flex items-center justify-center font-title text-2xl font-bold uppercase">
-                                        {currentSession.user.name.charAt(0)}
+                                    {@const avatar = getUserAvatarDragon(currentSession.user.id)}
+                                    <div class="w-full h-full flex items-center justify-center p-2 {avatar.bgClass}">
+                                        <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                     </div>
                                 {/if}
                                 <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
