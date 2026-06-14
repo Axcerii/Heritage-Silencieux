@@ -587,7 +587,7 @@
                 <div>
                     <textarea 
                         bind:value={newReviewComment}
-                        placeholder="Partagez vos impressions sur cet ouvrage avec le cercle..."
+                        placeholder="Partagez vos impressions sur cet ouvrage avec la bibliothèque..."
                         rows="3"
                         class="w-full bg-primary/20 text-white border border-gray-800 focus:border-secondary p-3 rounded font-text text-sm focus:outline-none focus:ring-0"
                     ></textarea>
@@ -793,7 +793,7 @@
                                         text="Modifier"
                                         onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write?index=${chapter.index}`)}
                                         dragon="none"
-                                        border="Pura"
+                                        border="Yinva"
                                         class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-secondary border border-secondary/30 hover:bg-secondary/10"
                                     />
                                     <Cta 

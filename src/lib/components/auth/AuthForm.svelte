@@ -157,8 +157,8 @@
                         <Cta 
                             type="submit" 
                             disabled={loading}
-                            dragon="Pura"
-                            border="Pura"
+                            dragon="Artrish"
+                            border="Yinva"
                             class="w-full h-12 mt-6 font-title text-[20px] font-semibold uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.35)]"
                         >
                             {#if loading}
@@ -182,7 +182,7 @@
                         onClick={handleGoogleLogin} 
                         disabled={loading}
                         dragon="none"
-                        border="Pura"
+                        border="secondary"
                         class="w-full h-12 text-gray-100 font-text hover:bg-secondary/10 hover:text-secondary gap-2"
                     >
                         <img src="/extern_logos/google.svg" alt="" class="w-5 h-5 shrink-0" />
@@ -248,9 +248,9 @@
                         <Cta 
                             type="submit" 
                             disabled={loading}
-                            dragon="Pura"
-                            border="Pura"
-                            class="w-full h-12 mt-6 font-title text-[20px] font-semibold uppercase tracking-wider !text-black hover:shadow-[0_0_15px_rgba(210,182,116,0.35)]"
+                            dragon="Pestia"
+                            border="Lada"
+                            class="w-full h-12 mt-6 font-title text-[20px] font-semibold uppercase tracking-wider !text-white hover:shadow-[0_0_15px_rgba(210,182,116,0.35)]"
                         >
                             {#if loading}
                                 <div class="w-6 h-6 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
@@ -273,7 +273,7 @@
                         onClick={handleGoogleLogin} 
                         disabled={loading}
                         dragon="none"
-                        border="Pura"
+                        border="secondary"
                         class="w-full h-12 text-gray-100 font-text hover:bg-secondary/10 hover:text-secondary gap-2"
                     >
                         <img src="/extern_logos/google.svg" alt="" class="w-5 h-5 shrink-0" />

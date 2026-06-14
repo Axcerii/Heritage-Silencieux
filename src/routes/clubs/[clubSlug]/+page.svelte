@@ -36,7 +36,7 @@
     $effect(() => {
         if (club) {
             breadcrumbs.set([
-                { label: 'Cercles', href: '/' },
+                { label: 'Bibliothèques', href: '/' },
                 { label: club.name }
             ]);
         }
@@ -322,8 +322,8 @@
                                     <Cta 
                                         text="Ajouter un Livre"
                                         onClick={() => { activeClubTab = 'library'; showAddModal = true; }}
-                                        dragon="Lada"
-                                        border="Pestia"
+                                        dragon="Artrish"
+                                        border="Yinva"
                                         class="h-9 px-4 font-title text-[13px] uppercase tracking-wider !text-black w-full flex items-center justify-center cursor-pointer"
                                     />
                                 {/if}

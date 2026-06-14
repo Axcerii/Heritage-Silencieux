@@ -24,7 +24,7 @@
     $effect(() => {
         if (club && book) {
             breadcrumbs.set([
-                { label: 'Cercles', href: '/' },
+                { label: 'Bibliothèques', href: '/' },
                 { label: club.name, href: `/clubs/${club.slug}` },
                 { label: book.title, href: `/clubs/${club.slug}/books/${book.id}` },
                 { label: isEditMode ? `Modifier le Chapitre ${editIndex}` : 'Nouveau Chapitre' }
@@ -51,6 +51,33 @@
     const isEditMode = $derived(!!page.url.searchParams.get('index'));
     const editIndex = $derived(Number(page.url.searchParams.get('index')));
 
+    // LocalStorage Draft states
+    let restoredFromDraft = $state(false);
+    const localStorageKey = $derived(`draft-chapter-${data.clubSlug}-${data.bookId}-${isEditMode ? editIndex : 'new'}`);
+
+    function saveDraft(contentOverride?: string) {
+        const content = contentOverride !== undefined ? contentOverride : (easyMDEInstance ? easyMDEInstance.value() : '');
+        if (content.trim() || chapterTitle.trim()) {
+            const draftData = {
+                title: chapterTitle,
+                index: chapterIndex,
+                content: content
+            };
+            localStorage.setItem(localStorageKey, JSON.stringify(draftData));
+        } else {
+            localStorage.removeItem(localStorageKey);
+        }
+    }
+
+    // Reactively save draft when title or index changes
+    $effect(() => {
+        const _title = chapterTitle;
+        const _index = chapterIndex;
+        if (!loading && easyMDEInstance) {
+            saveDraft();
+        }
+    });
+
     async function loadDataAndInitEditor() {
         loading = true;
         error = null;
@@ -66,7 +93,7 @@
             const allClubs = await getClubs();
             club = allClubs.find(c => c.slug === data.clubSlug) || null;
             if (!club) {
-                error = "Cercle introuvable.";
+                error = "Bibliothèque introuvable.";
                 loading = false;
                 return;
             }
@@ -88,14 +115,37 @@
             chapters = chaptersResponse.data;
 
             let initialContent = '';
+            const savedDraftJson = localStorage.getItem(localStorageKey);
+            let savedDraft: { title?: string; index?: number; content?: string } | null = null;
+            if (savedDraftJson) {
+                try {
+                    savedDraft = JSON.parse(savedDraftJson);
+                } catch (e) {
+                    console.error('Failed to parse draft JSON:', e);
+                }
+            }
 
             // 4. Load chapter context if in edit mode
             if (isEditMode) {
                 try {
                     targetChapter = await getChapter(data.clubSlug, data.bookId, editIndex);
-                    chapterTitle = targetChapter.title;
-                    chapterIndex = targetChapter.index;
-                    initialContent = targetChapter.content;
+                    
+                    const hasDifferences = savedDraft && (
+                        (savedDraft.title !== undefined && savedDraft.title !== targetChapter.title) ||
+                        (savedDraft.index !== undefined && savedDraft.index !== targetChapter.index) ||
+                        (savedDraft.content !== undefined && savedDraft.content !== targetChapter.content)
+                    );
+
+                    if (savedDraft && hasDifferences) {
+                        chapterTitle = savedDraft.title !== undefined ? savedDraft.title : targetChapter.title;
+                        chapterIndex = savedDraft.index !== undefined ? savedDraft.index : targetChapter.index;
+                        initialContent = savedDraft.content !== undefined ? savedDraft.content : targetChapter.content;
+                        restoredFromDraft = true;
+                    } else {
+                        chapterTitle = targetChapter.title;
+                        chapterIndex = targetChapter.index;
+                        initialContent = targetChapter.content;
+                    }
                 } catch (e: any) {
                     error = `Chapitre d'index ${editIndex} introuvable pour ce livre.`;
                     loading = false;
@@ -107,6 +157,19 @@
                     chapterIndex = Math.max(...chapters.map(c => c.index)) + 1;
                 } else {
                     chapterIndex = 1;
+                }
+                
+                if (savedDraft) {
+                    if (savedDraft.title !== undefined) chapterTitle = savedDraft.title;
+                    if (savedDraft.index !== undefined) chapterIndex = savedDraft.index;
+                    if (savedDraft.content !== undefined && savedDraft.content.trim()) {
+                        initialContent = savedDraft.content;
+                        restoredFromDraft = true;
+                    } else {
+                        initialContent = '';
+                    }
+                } else {
+                    initialContent = '';
                 }
             }
 
@@ -153,6 +216,11 @@
                         }
                     }
                 } as any);
+
+                // Auto-save changes to localStorage
+                easyMDEInstance.codemirror.on('change', () => {
+                    saveDraft(easyMDEInstance.value());
+                });
             }, 50);
 
         } catch (e: any) {
@@ -188,6 +256,8 @@
                     content: content
                 });
             }
+            // Remove the auto-saved draft from localStorage upon successful save
+            localStorage.removeItem(localStorageKey);
             // Navigate back to book details page
             goto(`/clubs/${data.clubSlug}/books/${data.bookId}`);
         } catch (e: any) {
@@ -245,6 +315,12 @@
             </button>
         </div>
 
+        {#if restoredFromDraft}
+            <div class="flex gap-4 items-center p-3.5 border border-secondary/30 bg-secondary/10 text-secondary rounded font-text text-sm shadow-[0_0_15px_rgba(210,182,116,0.05)] animate-in fade-in slide-in-from-top-2 duration-200">
+                <img src="/dragons_logos/tampons/Chronos.svg" alt="Sablier" class="Artrish-svg w-12">Récit restauré depuis votre dernier brouillon enregistré localement.
+            </div>
+        {/if}
+
         <form onsubmit={handleSave} class="space-y-6">
             <!-- Index & Title Inputs -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-background/50 border border-gray-800 p-4 rounded-lg">
@@ -297,8 +373,8 @@
                     type="submit"
                     disabled={saving}
                     text={saving ? 'Sauvegarde...' : (isEditMode ? 'Enregistrer les modifications' : 'Graver le chapitre')}
-                    dragon="Pura"
-                    border="Pura"
+                    dragon="Artrish"
+                    border="Yinva"
                     class="w-full sm:w-2/3 h-12 font-title text-sm uppercase tracking-wider !text-black"
                 />
             </div>

@@ -281,8 +281,8 @@
                                 type="submit"
                                 disabled={adding}
                                 text={adding ? 'Ajout...' : 'Ajouter'}
-                                dragon="Pura"
-                                border="Pura"
+                                dragon="Artrish"
+                                border="Yinva"
                                 class="w-1/2 h-10 font-title text-sm uppercase tracking-wider !text-black"
                             />
                         </div>

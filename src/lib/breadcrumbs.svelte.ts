@@ -14,19 +14,19 @@ export const breadcrumbs = {
         // Dynamic fallback based on current pathname
         const path = page.url.pathname;
         if (path === '/') {
-            return [{ label: 'Cercles' }];
+            return [{ label: 'Bibliothèques' }];
         }
         if (path.startsWith('/admin')) {
-            return [{ label: 'Cercles', href: '/' }, { label: 'Administration' }];
+            return [{ label: 'Bibliothèques', href: '/' }, { label: 'Administration' }];
         }
         
         // Parse clubs paths: /clubs/[clubSlug]/books/[bookId]/...
         const parts = path.split('/').filter(Boolean);
-        const result: BreadcrumbItem[] = [{ label: 'Cercles', href: '/' }];
+        const result: BreadcrumbItem[] = [{ label: 'Bibliothèques', href: '/' }];
         
         if (parts[0] === 'clubs' && parts[1]) {
             const clubSlug = parts[1];
-            result.push({ label: 'Cercle', href: `/clubs/${clubSlug}` });
+            result.push({ label: 'Bibliothèque', href: `/clubs/${clubSlug}` });
             
             if (parts[2] === 'books' && parts[3]) {
                 const bookId = parts[3];

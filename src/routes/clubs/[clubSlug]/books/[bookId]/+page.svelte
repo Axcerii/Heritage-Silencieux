@@ -21,7 +21,7 @@
     $effect(() => {
         if (club && book) {
             breadcrumbs.set([
-                { label: 'Cercles', href: '/' },
+                { label: 'Bibliothèques', href: '/' },
                 { label: club.name, href: `/clubs/${club.slug}` },
                 { label: book.title }
             ]);
@@ -35,7 +35,7 @@
             const allClubs = await getClubs();
             club = allClubs.find(c => c.slug === data.clubSlug) || null;
             if (!club) {
-                error = "Cercle introuvable.";
+                error = "Bibliothèque introuvable.";
                 return;
             }
 

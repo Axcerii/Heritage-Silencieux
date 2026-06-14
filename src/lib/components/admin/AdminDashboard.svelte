@@ -42,7 +42,7 @@
         try {
             clubs = await getClubs();
         } catch (e: any) {
-            clubError = e.message || 'Erreur lors du chargement des cercles.';
+            clubError = e.message || 'Erreur lors du chargement des bibliothèques.';
         } finally {
             loadingClubs = false;
         }
@@ -71,7 +71,7 @@
     async function handleToggleClubStatus(club: Club) {
         const nextStatus = !club.isActive;
         const action = nextStatus ? 'réactiver' : 'désactiver';
-        if (!confirm(`Êtes-vous sûr de vouloir ${action} ce cercle ?`)) return;
+        if (!confirm(`Êtes-vous sûr de vouloir ${action} cette bibliothèque ?`)) return;
 
         try {
             await updateClub(club.id, { isActive: nextStatus });
@@ -85,7 +85,7 @@
     }
 
     async function handleDeleteClub(club: Club) {
-        if (!confirm(`ATTENTION: Voulez-vous vraiment détruire définitivement le cercle "${club.name}" ? Cette action effacera tous ses livres et progressions associés.`)) return;
+        if (!confirm(`ATTENTION: Voulez-vous vraiment détruire définitivement la bibliothèque "${club.name}" ? Cette action effacera tous ses livres et progressions associés.`)) return;
 
         try {
             await deleteClub(club.id);
@@ -104,7 +104,7 @@
 <div class="w-full max-w-6xl mx-auto p-4 sm:p-6 space-y-6">
     <div class="border-b border-secondary/20 pb-6">
         <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">Panneau d'Administration</h1>
-        <p class="text-gray-400 font-text text-sm sm:text-base">Gérez les initiés de l'ordre et régulez les cercles de lecture de l'alliance.</p>
+        <p class="text-gray-400 font-text text-sm sm:text-base">Gérez les initiés de l'ordre et régulez les bibliothèques de l'alliance.</p>
     </div>
 
     <!-- Admin Tabs Menu -->
@@ -119,7 +119,7 @@
             onclick={() => activeTab = 'clubs'}
             class="flex-1 sm:flex-initial text-center px-4 sm:px-6 py-2.5 sm:py-3 font-title text-sm sm:text-lg uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeTab === 'clubs' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400 hover:text-white'}"
         >
-            Cercles ({clubs.length})
+            Bibliothèques ({clubs.length})
         </button>
     </div>
 
@@ -187,7 +187,7 @@
     <!-- Clubs Administration Tab -->
     {#if activeTab === 'clubs'}
         <div class="space-y-4">
-            <h2 class="text-xl font-title text-white">Régulation Globale des Cercles de Lecture</h2>
+            <h2 class="text-xl font-title text-white">Régulation Globale des Bibliothèques</h2>
 
             {#if loadingClubs}
                 <div class="flex justify-center py-12">
@@ -200,7 +200,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-gray-800 text-[10px] uppercase tracking-widest text-gray-500 font-text">
-                                <th class="p-4">Cercle</th>
+                                <th class="p-4">Bibliothèque</th>
                                 <th class="p-4">Slug</th>
                                 <th class="p-4">Statut</th>
                                 <th class="p-4 text-right">Actions</th>

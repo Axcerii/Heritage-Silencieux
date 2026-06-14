@@ -130,7 +130,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-800 pb-4 gap-4">
         <div>
             <h2 class="text-2xl font-title text-secondary tracking-wider">Membres de l'Alliance</h2>
-            <p class="text-sm text-gray-400 font-text">Gérez les initiés ayant accès à ce cercle de lecture.</p>
+            <p class="text-sm text-gray-400 font-text">Gérez les initiés ayant accès à cette bibliothèque.</p>
         </div>
     </div>
 
@@ -147,7 +147,7 @@
                         placeholder="Email du membre" 
                         bind:value={inviteEmail}
                         required
-                        class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm flex-1"
+                        class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 p-3! text-sm flex-1"
                     />
                     <Cta 
                         type="submit" 
@@ -163,7 +163,7 @@
                     <p class="text-xs text-Chronos font-text">{inviteError}</p>
                 {/if}
                 {#if inviteSuccess}
-                    <p class="text-xs text-Guizamark font-text">L'initié a été ajouté avec succès au cercle !</p>
+                    <p class="text-xs text-Guizamark font-text">L'initié a été ajouté avec succès à la bibliothèque !</p>
                 {/if}
             </form>
 

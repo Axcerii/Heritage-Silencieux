@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-    <title>Cercles de Lecture — Heritage Silencieux</title>
+    <title>Bibliothèques — Heritage Silencieux</title>
 </svelte:head>
 
 

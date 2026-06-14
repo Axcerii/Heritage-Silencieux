@@ -23,7 +23,7 @@
             const allClubs = await getClubs();
             club = allClubs.find(c => c.slug === data.clubSlug) || null;
             if (!club) {
-                error = "Cercle introuvable.";
+                error = "Bibliothèque introuvable.";
                 return;
             }
 

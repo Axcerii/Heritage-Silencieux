@@ -25,7 +25,7 @@
         <!-- Left half of the logo -->
         <div class="relative w-[150px] h-[300px] sm:w-[220px] sm:h-[440px] overflow-hidden pointer-events-none">
             <img 
-                src="/dragons_logos/normal/Artrish.svg" 
+                src="/LeTout.svg" 
                 alt="" 
                 class="absolute max-w-none h-full w-[300px] sm:w-[440px] left-0 top-0 object-contain secondary-svg opacity-60" 
             />
@@ -42,7 +42,7 @@
         <!-- Right half of the logo -->
         <div class="relative w-[150px] h-[300px] sm:w-[220px] sm:h-[440px] overflow-hidden pointer-events-none">
             <img 
-                src="/dragons_logos/normal/Artrish.svg" 
+                src="/LeTout.svg" 
                 alt="" 
                 class="absolute max-w-none h-full w-[300px] sm:w-[440px] right-0 top-0 object-contain secondary-svg opacity-60" 
             />
