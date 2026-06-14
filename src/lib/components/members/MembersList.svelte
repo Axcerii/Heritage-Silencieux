@@ -3,7 +3,7 @@
     import { getClubMembers, addClubMember, updateClubMemberRole, removeClubMember, getJoinRequests, approveJoinRequest, rejectJoinRequest, type ClubMember } from '../../api';
     import type { AuthSession } from '../../auth-client';
     import Cta from '../Cta.svelte';
-    import { censorEmail, getImageUrl } from '$lib';
+    import { censorEmail, getImageUrl, getUserAvatarDragon } from '$lib';
 
     let { clubSlug, userRole, session } = $props<{
         clubSlug: string;
@@ -130,7 +130,7 @@
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-800 pb-4 gap-4">
         <div>
             <h2 class="text-2xl font-title text-secondary tracking-wider">Membres de l'Alliance</h2>
-            <p class="text-sm text-gray-400 font-text">Gérez les initiés ayant accès à ce cercle de lecture.</p>
+            <p class="text-sm text-gray-400 font-text">Gérez les initiés ayant accès à cette bibliothèque.</p>
         </div>
     </div>
 
@@ -144,18 +144,18 @@
                 <div class="flex flex-col sm:flex-row gap-3">
                     <input 
                         type="email" 
-                        placeholder="Adresse email de l'initié..." 
+                        placeholder="Email du membre" 
                         bind:value={inviteEmail}
                         required
-                        class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm flex-1"
+                        class="bg-primary text-black border border-foreground/30 focus:border-secondary h-10 p-3! text-sm flex-1"
                     />
                     <Cta 
                         type="submit" 
                         disabled={inviting}
-                        text={inviting ? 'Recrutement...' : 'Ajouter au cercle'}
-                        dragon="Pura"
-                        border="Pura"
-                        class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-black shrink-0"
+                        text={inviting ? 'Recrutement...' : 'Ajouter'}
+                        dragon="Pestia"
+                        border="Lada"
+                        class="h-10 !w-auto px-5 font-title text-xs uppercase tracking-wider !text-white shrink-0"
                     />
                 </div>
 
@@ -163,7 +163,7 @@
                     <p class="text-xs text-Chronos font-text">{inviteError}</p>
                 {/if}
                 {#if inviteSuccess}
-                    <p class="text-xs text-Guizamark font-text">L'initié a été ajouté avec succès au cercle !</p>
+                    <p class="text-xs text-Guizamark font-text">L'initié a été ajouté avec succès à la bibliothèque !</p>
                 {/if}
             </form>
 
@@ -186,8 +186,9 @@
                                         {#if req.user.image}
                                             <img src={getImageUrl(req.user.image)} alt="" class="w-7 h-7 rounded-full object-cover" />
                                         {:else}
-                                            <div class="w-7 h-7 rounded-full bg-primary text-black flex items-center justify-center font-bold text-xs shrink-0">
-                                                {req.user.name?.charAt(0) || 'U'}
+                                            {@const avatar = getUserAvatarDragon(req.userId)}
+                                            <div class="w-7 h-7 rounded-full flex items-center justify-center shrink-0 border border-secondary/30 p-0.5 {avatar.bgClass}">
+                                                <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                             </div>
                                         {/if}
                                         <div class="min-w-0">
@@ -229,7 +230,7 @@
         <p class="text-center py-8 text-Chronos font-text">{error}</p>
     {:else}
         <!-- Members List -->
-        <div class="border border-gray-800 rounded-lg overflow-hidden bg-background/60">
+        <div class="border border-gray-800 rounded-lg overflow-x-auto bg-background/60">
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="border-b border-gray-800 text-[10px] uppercase tracking-widest text-gray-500 font-text">
@@ -250,8 +251,9 @@
                                 {#if member.user.image}
                                     <img src={getImageUrl(member.user.image)} alt="" class="w-8 h-8 rounded-full object-cover" />
                                 {:else}
-                                    <div class="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-bold text-sm">
-                                        {member.user.name?.charAt(0) || 'U'}
+                                    {@const avatar = getUserAvatarDragon(member.userId)}
+                                    <div class="w-8 h-8 rounded-full flex items-center justify-center border border-secondary/30 p-1 {avatar.bgClass}">
+                                        <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                     </div>
                                 {/if}
                                 <span class="text-white font-semibold">{member.user.name || 'Utilisateur'}</span>

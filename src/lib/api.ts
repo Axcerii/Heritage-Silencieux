@@ -14,6 +14,7 @@ export interface Club {
 export interface Book {
     id: string;
     title: string;
+    slug: string;
     author: string;
     genre: string;
     pages: number;
@@ -195,26 +196,26 @@ export function getBooks(clubSlug: string): Promise<Book[]> {
     return apiRequest<Book[]>(`/clubs/${clubSlug}/books`);
 }
 
-export function getBookDetails(clubSlug: string, bookId: string): Promise<Book> {
-    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`);
+export function getBookDetails(clubSlug: string, bookSlug: string): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookSlug}`);
 }
 
-export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages?: number; theme?: DragonTheme }): Promise<Book> {
+export function createBook(clubSlug: string, data: { title: string; author: string; genre: string; pages?: number; theme?: DragonTheme; slug?: string }): Promise<Book> {
     return apiRequest<Book>(`/clubs/${clubSlug}/books`, {
         method: 'POST',
         body: JSON.stringify(data)
     });
 }
 
-export function updateBook(clubSlug: string, bookId: string, data: { title?: string; author?: string; genre?: string; pages?: number; isActive?: boolean; theme?: DragonTheme }): Promise<Book> {
-    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`, {
+export function updateBook(clubSlug: string, bookSlug: string, data: { title?: string; author?: string; genre?: string; pages?: number; isActive?: boolean; theme?: DragonTheme; slug?: string }): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookSlug}`, {
         method: 'PATCH',
         body: JSON.stringify(data)
     });
 }
 
-export function deleteBook(clubSlug: string, bookId: string): Promise<Book> {
-    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookId}`, {
+export function deleteBook(clubSlug: string, bookSlug: string): Promise<Book> {
+    return apiRequest<Book>(`/clubs/${clubSlug}/books/${bookSlug}`, {
         method: 'DELETE'
     });
 }
@@ -234,55 +235,55 @@ export interface ChaptersResponse {
     };
 }
 
-export function getChapters(clubSlug: string, bookId: string): Promise<ChaptersResponse> {
-    return apiRequest<ChaptersResponse>(`/clubs/${clubSlug}/books/${bookId}/chapters`);
+export function getChapters(clubSlug: string, bookSlug: string): Promise<ChaptersResponse> {
+    return apiRequest<ChaptersResponse>(`/clubs/${clubSlug}/books/${bookSlug}/chapters`);
 }
 
-export function getChapter(clubSlug: string, bookId: string, index: number): Promise<Chapter> {
-    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`);
+export function getChapter(clubSlug: string, bookSlug: string, index: number): Promise<Chapter> {
+    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookSlug}/chapters/${index}`);
 }
 
-export function createChapter(clubSlug: string, bookId: string, data: { index: number; title: string; content: string }): Promise<Chapter> {
-    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookId}/chapters`, {
+export function createChapter(clubSlug: string, bookSlug: string, data: { index: number; title: string; content: string }): Promise<Chapter> {
+    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookSlug}/chapters`, {
         method: 'POST',
         body: JSON.stringify(data)
     });
 }
 
-export function updateChapter(clubSlug: string, bookId: string, index: number, data: { index?: number; title?: string; content?: string }): Promise<Chapter> {
-    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`, {
+export function updateChapter(clubSlug: string, bookSlug: string, index: number, data: { index?: number; title?: string; content?: string }): Promise<Chapter> {
+    return apiRequest<Chapter>(`/clubs/${clubSlug}/books/${bookSlug}/chapters/${index}`, {
         method: 'PATCH',
         body: JSON.stringify(data)
     });
 }
 
-export function deleteChapter(clubSlug: string, bookId: string, index: number): Promise<any> {
-    return apiRequest<any>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}`, {
+export function deleteChapter(clubSlug: string, bookSlug: string, index: number): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/books/${bookSlug}/chapters/${index}`, {
         method: 'DELETE'
     });
 }
 
-export function toggleChapterRead(clubSlug: string, bookId: string, index: number, read: boolean): Promise<any> {
-    return apiRequest<any>(`/clubs/${clubSlug}/books/${bookId}/chapters/${index}/read`, {
+export function toggleChapterRead(clubSlug: string, bookSlug: string, index: number, read: boolean): Promise<any> {
+    return apiRequest<any>(`/clubs/${clubSlug}/books/${bookSlug}/chapters/${index}/read`, {
         method: 'PATCH',
         body: JSON.stringify({ read })
     });
 }
 
 // --- PROGRESSION ---
-export function getProgression(clubSlug: string, bookId: string): Promise<Progression | null> {
-    return apiRequest<Progression | null>(`/clubs/${clubSlug}/books/${bookId}/progression`).catch(() => null);
+export function getProgression(clubSlug: string, bookSlug: string): Promise<Progression | null> {
+    return apiRequest<Progression | null>(`/clubs/${clubSlug}/books/${bookSlug}/progression`).catch(() => null);
 }
 
-export function updateProgression(clubSlug: string, bookId: string, currentPage: number): Promise<Progression> {
-    return apiRequest<Progression>(`/clubs/${clubSlug}/books/${bookId}/progression`, {
+export function updateProgression(clubSlug: string, bookSlug: string, currentPage: number): Promise<Progression> {
+    return apiRequest<Progression>(`/clubs/${clubSlug}/books/${bookSlug}/progression`, {
         method: 'PATCH',
         body: JSON.stringify({ currentPage })
     });
 }
 
-export function getGlobalProgressions(clubSlug: string, bookId: string): Promise<MemberProgression[]> {
-    return apiRequest<MemberProgression[]>(`/clubs/${clubSlug}/books/${bookId}/progressions`).catch(() => []);
+export function getGlobalProgressions(clubSlug: string, bookSlug: string): Promise<MemberProgression[]> {
+    return apiRequest<MemberProgression[]>(`/clubs/${clubSlug}/books/${bookSlug}/progressions`).catch(() => []);
 }
 
 export interface AdminUser {
@@ -296,12 +297,12 @@ export interface AdminUser {
 }
 
 // --- REVIEWS ---
-export function getReviews(clubSlug: string, bookId: string): Promise<Review[]> {
-    return apiRequest<Review[]>(`/clubs/${clubSlug}/books/${bookId}/reviews`);
+export function getReviews(clubSlug: string, bookSlug: string): Promise<Review[]> {
+    return apiRequest<Review[]>(`/clubs/${clubSlug}/books/${bookSlug}/reviews`);
 }
 
-export function createReview(clubSlug: string, bookId: string, rating: number, comment?: string): Promise<Review> {
-    return apiRequest<Review>(`/clubs/${clubSlug}/books/${bookId}/reviews`, {
+export function createReview(clubSlug: string, bookSlug: string, rating: number, comment?: string): Promise<Review> {
+    return apiRequest<Review>(`/clubs/${clubSlug}/books/${bookSlug}/reviews`, {
         method: 'POST',
         body: JSON.stringify({ rating, comment })
     });

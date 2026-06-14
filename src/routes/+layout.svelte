@@ -1,12 +1,18 @@
 <script lang="ts">
     import '../globals.css';
+    import { onMount } from 'svelte';
     import Cta from '$lib/components/Cta.svelte';
     import favicon from '$lib/assets/favicon.svg';
     import AuthPage from '$lib/components/auth/AuthPage.svelte';
     import { signOut, type AuthSession } from '$lib/auth-client';
     import { page } from '$app/state';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
-    import { censorEmail, getImageUrl } from '$lib';
+    import { censorEmail, getImageUrl, getUserAvatarDragon } from '$lib';
+    import { sidebarState } from '$lib/sidebar.svelte';
+
+    onMount(() => {
+        sidebarState.init();
+    });
 
     let { data, children } = $props<{
         data: { session: AuthSession | null };
@@ -109,15 +115,14 @@
             <div class="flex items-center space-x-4 min-w-0">
                 <!-- App Title Logo -->
                 <a href="/" class="flex items-center space-x-3 cursor-pointer shrink-0 focus:outline-none">
-                    <img src="/dragons_logos/normal/Artrish.svg" alt="" class="w-8 h-8 secondary-svg" />
-                    <h1 class="text-base font-title text-secondary tracking-widest uppercase hidden md:block select-none">Heritage Silencieux</h1>
+                    <img src="/Heritage_Silencieux_Logo.svg" alt="" class="w-30 secondary-svg" />
                 </a>
 
                 <!-- Divider -->
-                <div class="h-4 w-[1px] bg-gray-800 shrink-0"></div>
+                <div class="hidden md:block h-4 w-[1px] bg-gray-800 shrink-0"></div>
 
                 <!-- Breadcrumbs -->
-                <nav class="flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold min-w-0">
+                <nav class="hidden md:flex items-center space-x-2 text-xs font-title tracking-wider text-gray-400 uppercase font-bold min-w-0">
                     {#each breadcrumbs.items as item, i}
                         {#if i > 0}
                             <span class="text-gray-600 shrink-0">/</span>
@@ -146,8 +151,9 @@
                     {#if currentSession.user.image}
                         <img src={getImageUrl(currentSession.user.image)} alt="" class="w-8 h-8 rounded-full object-cover border border-secondary group-hover:border-primary transition-colors" />
                     {:else}
-                        <div class="w-8 h-8 rounded-full bg-primary text-black flex items-center justify-center font-title text-sm font-bold uppercase shrink-0 group-hover:bg-secondary transition-colors">
-                            {currentSession.user.name.charAt(0)}
+                        {@const avatar = getUserAvatarDragon(currentSession.user.id)}
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border border-secondary group-hover:border-primary transition-all p-1 {avatar.bgClass}">
+                            <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                         </div>
                     {/if}
                     <span class="hidden sm:inline text-sm font-title text-gray-300 group-hover:text-secondary transition-colors truncate max-w-[120px]">{currentSession.user.name}</span>
@@ -172,8 +178,9 @@
                                 {#if currentSession.user.image}
                                     <img src={getImageUrl(currentSession.user.image)} alt="" class="w-full h-full object-cover" />
                                 {:else}
-                                    <div class="w-full h-full bg-primary text-black flex items-center justify-center font-title text-2xl font-bold uppercase">
-                                        {currentSession.user.name.charAt(0)}
+                                    {@const avatar = getUserAvatarDragon(currentSession.user.id)}
+                                    <div class="w-full h-full flex items-center justify-center p-2 {avatar.bgClass}">
+                                        <img src={avatar.logo} alt="" class="w-full h-full object-contain {avatar.svgClass}" />
                                     </div>
                                 {/if}
                                 <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">

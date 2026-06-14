@@ -7,6 +7,7 @@
     import MembersList from '$lib/components/members/MembersList.svelte';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
     import Cta from '$lib/components/Cta.svelte';
+    import { sidebarState } from '$lib/sidebar.svelte';
 
     let { data } = $props<{
         data: { clubSlug: string; session: AuthSession };
@@ -35,7 +36,7 @@
     $effect(() => {
         if (club) {
             breadcrumbs.set([
-                { label: 'Cercles', href: '/' },
+                { label: 'Bibliothèques', href: '/' },
                 { label: club.name }
             ]);
         }
@@ -149,7 +150,7 @@
     }
 
     function handleSelectBook(book: Book) {
-        goto(`/clubs/${data.clubSlug}/books/${book.id}`);
+        goto(`/clubs/${data.clubSlug}/books/${book.slug}`);
     }
 
     async function handleExportCsv() {
@@ -193,22 +194,31 @@
     </div>
 {:else}
 
-    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null ? 'p-4 sm:p-8 md:pl-72' : 'max-w-6xl mx-auto p-4 sm:p-6'}">
+    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null || data.session?.user?.role === 'ADMIN' ? (sidebarState.isOpen ? 'p-4 sm:p-8 md:pl-72 lg:pl-72' : 'p-4 sm:p-8 md:pl-8 lg:pl-72') : 'max-w-6xl mx-auto p-4 sm:p-6'}">
         <!-- Club Detail Header -->
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-secondary/20 pb-6 gap-4">
             <div>
                 <h1 class="text-3xl sm:text-5xl font-title text-secondary tracking-wider mb-2">{club.name}</h1>
             </div>
             
-            <div class="flex flex-col sm:items-end">
+            <div class="flex flex-col sm:items-end gap-2">
                 <span class="text-sm font-title uppercase tracking-wider text-secondary mt-1">
                     {data.session?.user?.role === 'ADMIN' ? 'Administrateur' : userRole === 'OWNER' ? 'Propriétaire' : userRole === 'EDITOR' ? 'Éditeur' : userRole === 'READER' ? 'Lecteur' : 'Visiteur'}
                 </span>
+                {#if data.session?.user?.role === 'ADMIN' && userRole === null}
+                    <button 
+                        onclick={handleJoinClub}
+                        disabled={joining}
+                        class="px-3 py-1 text-xs border border-secondary/40 hover:bg-secondary/15 rounded text-secondary hover:text-white transition-all cursor-pointer"
+                    >
+                        {joining ? 'Rejoindre...' : 'Rejoindre la bibliothèque'}
+                    </button>
+                {/if}
             </div>
         </div>
 
-        {#if userRole === null}
-            <div class="max-w-2xl mx-auto my-12 p-8 bg-background/40 backdrop-blur-md border border-secondary/30 rounded-lg text-center shadow-xl space-y-6">
+        {#if userRole === null && data.session?.user?.role !== 'ADMIN'}
+            <div class="max-w-2xl mx-auto my-12 p-4 sm:p-8 bg-background/40 backdrop-blur-md border border-secondary/30 rounded-lg text-center shadow-xl space-y-6">
                 <div class="absolute w-full top-0 left-0 z-[-1] secondary-svg opacity-20 pointer-events-none">
                     <img src="/Envelope.svg" alt="" class="w-full h-full object-contain primary-svg">
                 </div>
@@ -266,11 +276,11 @@
         {:else}
             <div class="flex flex-col md:flex-row gap-8 items-start">
                 <!-- Sidebar on Desktop (viewport fixed on left) -->
-                <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto">
+                <aside class="hidden md:flex flex-col w-64 fixed top-[73px] bottom-0 left-0 bg-[#1b1b1b]/80 backdrop-blur-md border-r border-secondary/20 p-6 z-10 space-y-6 overflow-y-auto transition-transform duration-300 lg:translate-x-0 {sidebarState.isOpen ? 'md:translate-x-0' : 'md:-translate-x-full'}">
                     <!-- Back Button to Circle List -->
                     <a 
                         href="/" 
-                        class="flex items-center justify-center gap-2 font-title text-sm tracking-wider text-secondary hover:text-white hover:underline rounded transition-all duration-200 cursor-pointer"
+                        class="flex items-center justify-center gap-2 font-title text-sm tracking-wider text-secondary hover:text-white hover:underline rounded transition-all duration-200 cursor-pointer mt-8"
                     >
                         ← Retour à l'entrée
                     </a>
@@ -297,8 +307,8 @@
                                     onclick={() => activeClubTab = 'admin'}
                                     class="w-full text-left px-4 py-2.5 font-title text-base uppercase tracking-wider rounded border-l-2 transition-all cursor-pointer flex items-center gap-3 {activeClubTab === 'admin' ? 'border-secondary bg-secondary/10 text-secondary' : 'border-transparent text-gray-400 hover:text-white hover:bg-white/5'}"
                                 >
-                                    <img src="/dragons_logos/normal/Chronos.svg" alt="" class="w-8 h-8 secondary-svg">
-                                    Administration
+                                    <img src="/dragons_logos/normal/Yinva.svg" alt="" class="w-8 h-8 secondary-svg">
+                                    Admin
                                 </button>
                             {/if}
                         </nav>
@@ -312,8 +322,8 @@
                                     <Cta 
                                         text="Ajouter un Livre"
                                         onClick={() => { activeClubTab = 'library'; showAddModal = true; }}
-                                        dragon="Lada"
-                                        border="Pestia"
+                                        dragon="Artrish"
+                                        border="Yinva"
                                         class="h-9 px-4 font-title text-[13px] uppercase tracking-wider !text-black w-full flex items-center justify-center cursor-pointer"
                                     />
                                 {/if}
@@ -331,83 +341,102 @@
                     {/if}
                 </aside>
 
+                <!-- Sidebar Toggle Button (Tablet Drawer Control) -->
+                <button 
+                    onclick={() => sidebarState.isOpen = !sidebarState.isOpen}
+                    class="hidden md:flex lg:hidden fixed top-[88px] z-20 w-8 h-8 bg-[#1b1b1b]/90 backdrop-blur-md border border-secondary/30 hover:border-secondary/70 text-secondary hover:text-white rounded-full items-center justify-center transition-all duration-300 shadow-md hover:shadow-[0_0_15px_rgba(210,182,116,0.25)] hover:scale-105 active:scale-95 cursor-pointer {sidebarState.isOpen ? 'left-[240px]' : 'left-4'}"
+                    title={sidebarState.isOpen ? "Masquer le menu" : "Afficher le menu"}
+                >
+                    {#if sidebarState.isOpen}
+                        <svg class="w-4.5 h-4.5 text-secondary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    {:else}
+                        <svg class="w-4.5 h-4.5 text-secondary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    {/if}
+                </button>
+
                 <!-- Mobile Actions / Tabs (Mobile Only) -->
-                <div class="md:hidden w-full flex items-center justify-between border-b border-gray-800 pb-2 gap-4">
-                    <div class="flex items-center gap-2">
+                <div class="md:hidden w-full flex flex-col gap-3 border-b border-gray-800 pb-2">
+                    <!-- Top Row: Back Button & Actions Dropdown -->
+                    <div class="flex items-center justify-between w-full">
                         <a 
                             href="/" 
-                            class="w-8 h-8 mr-4 text-secondary font-title text-lg border border-secondary/35 bg-secondary/15 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0 hover:bg-secondary/25 active:scale-95 duration-200"
+                            class="w-8 h-8 text-secondary font-title text-lg border border-secondary/35 bg-secondary/15 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0 hover:bg-secondary/25 active:scale-95 duration-200 flex items-center justify-center"
                         >
                             ←
                         </a>
                         
-                        <div class="flex gap-0.5 border-b border-transparent">
-                            <button 
-                                onclick={() => activeClubTab = 'library'}
-                                class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
-                            >
-                                Livres
-                            </button>
-                            <button 
-                                onclick={() => activeClubTab = 'members'}
-                                class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'members' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
-                            >
-                                Membres
-                            </button>
-                            {#if userRole === 'OWNER' || data.session?.user?.role === 'ADMIN'}
+                        {#if canManageBooks || canExportCsv}
+                            <div class="relative">
                                 <button 
-                                    onclick={() => activeClubTab = 'admin'}
-                                    class="px-2.5 py-1.5 font-title text-xs sm:text-sm uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                                    onclick={() => showMobileMenu = !showMobileMenu}
+                                    class="px-2.5 py-1.5 bg-secondary/15 text-secondary border border-secondary/30 rounded font-title text-xs uppercase tracking-wider hover:bg-secondary/20 transition-all flex items-center gap-1.5 cursor-pointer"
                                 >
-                                    Admin
+                                    <span>Actions</span>
+                                    <svg class="w-3 h-3 transition-transform duration-200 {showMobileMenu ? 'rotate-180' : ''}" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
                                 </button>
-                            {/if}
-                        </div>
+
+                                {#if showMobileMenu}
+                                    <!-- Backdrop to close dropdown -->
+                                    <button 
+                                        type="button" 
+                                        class="fixed inset-0 z-40 bg-transparent cursor-default" 
+                                        onclick={() => showMobileMenu = false}
+                                        aria-label="Fermer le menu"
+                                    ></button>
+                                    
+                                    <!-- Glassmorphic Dropdown Menu -->
+                                    <div class="absolute right-0 mt-2 w-48 bg-[#1b1b1b]/95 backdrop-blur-md border border-secondary/30 rounded-lg shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                                        {#if canManageBooks}
+                                            <button 
+                                                onclick={() => { showMobileMenu = false; activeClubTab = 'library'; showAddModal = true; }}
+                                                class="w-full text-left px-4 py-2 text-sm font-text hover:bg-secondary/10 hover:text-secondary transition-colors cursor-pointer flex items-center gap-2"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                                                Ajouter un livre
+                                            </button>
+                                        {/if}
+                                        {#if canExportCsv}
+                                            <button 
+                                                onclick={() => { showMobileMenu = false; handleExportCsv(); }}
+                                                class="w-full text-left px-4 py-2 text-sm font-text hover:bg-secondary/10 hover:text-secondary transition-colors cursor-pointer flex items-center gap-2"
+                                            >
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+                                                Exporter CSV
+                                            </button>
+                                        {/if}
+                                    </div>
+                                {/if}
+                            </div>
+                        {/if}
                     </div>
 
-                    {#if canManageBooks || canExportCsv}
-                        <div class="relative">
+                    <!-- Bottom Row: Tabs -->
+                    <div class="flex gap-1 overflow-x-auto scrollbar-none flex-nowrap w-full">
+                        <button 
+                            onclick={() => activeClubTab = 'library'}
+                            class="flex-1 min-w-[70px] text-center py-2 font-title text-xs uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'library' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                        >
+                            Livres
+                        </button>
+                        <button 
+                            onclick={() => activeClubTab = 'members'}
+                            class="flex-1 min-w-[70px] text-center py-2 font-title text-xs uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'members' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
+                        >
+                            Membres
+                        </button>
+                        {#if userRole === 'OWNER' || data.session?.user?.role === 'ADMIN'}
                             <button 
-                                onclick={() => showMobileMenu = !showMobileMenu}
-                                class="px-2.5 py-1.5 bg-secondary/15 text-secondary border border-secondary/30 rounded font-title text-xs uppercase tracking-wider hover:bg-secondary/20 transition-all flex items-center gap-1.5 cursor-pointer"
+                                onclick={() => activeClubTab = 'admin'}
+                                class="flex-1 min-w-[70px] text-center py-2 font-title text-xs uppercase tracking-wider border-b-2 transition-colors cursor-pointer {activeClubTab === 'admin' ? 'border-secondary text-secondary' : 'border-transparent text-gray-400'}"
                             >
-                                <span>Actions</span>
-                                <svg class="w-3 h-3 transition-transform duration-200 {showMobileMenu ? 'rotate-180' : ''}" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+                                Admin
                             </button>
-
-                            {#if showMobileMenu}
-                                <!-- Backdrop to close dropdown -->
-                                <button 
-                                    type="button" 
-                                    class="fixed inset-0 z-40 bg-transparent cursor-default" 
-                                    onclick={() => showMobileMenu = false}
-                                    aria-label="Fermer le menu"
-                                ></button>
-                                
-                                <!-- Glassmorphic Dropdown Menu -->
-                                <div class="absolute right-0 mt-2 w-48 bg-[#1b1b1b]/95 backdrop-blur-md border border-secondary/30 rounded-lg shadow-xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
-                                    {#if canManageBooks}
-                                        <button 
-                                            onclick={() => { showMobileMenu = false; activeClubTab = 'library'; showAddModal = true; }}
-                                            class="w-full text-left px-4 py-2 text-sm font-text hover:bg-secondary/10 hover:text-secondary transition-colors cursor-pointer flex items-center gap-2"
-                                        >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                                            Ajouter un livre
-                                        </button>
-                                    {/if}
-                                    {#if canExportCsv}
-                                        <button 
-                                            onclick={() => { showMobileMenu = false; handleExportCsv(); }}
-                                            class="w-full text-left px-4 py-2 text-sm font-text hover:bg-secondary/10 hover:text-secondary transition-colors cursor-pointer flex items-center gap-2"
-                                        >
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-                                            Exporter CSV
-                                        </button>
-                                    {/if}
-                                </div>
-                            {/if}
-                        </div>
-                    {/if}
+                        {/if}
+                    </div>
                 </div>
 
                 <!-- Main Content Pane -->
@@ -429,7 +458,7 @@
                     {:else if activeClubTab === 'admin' && (userRole === 'OWNER' || data.session?.user?.role === 'ADMIN')}
                         <!-- Club Administration (OWNER only) -->
                         <div class="space-y-6 font-text max-w-4xl">
-                            <div class="bg-background/60 border border-gray-800 p-6 rounded-lg space-y-4">
+                            <div class="bg-background/60 border border-gray-800 p-4 sm:p-6 rounded-lg space-y-4">
                                 <h3 class="text-xl font-title text-secondary tracking-wider border-b border-gray-800 pb-2 font-semibold">Modifier la bibliothèque</h3>
                                 
                                 <form onsubmit={handleUpdateClub} class="grid grid-cols-1 md:grid-cols-5 gap-6">
@@ -532,8 +561,8 @@
                                                 type="submit"
                                                 disabled={updatingClub}
                                                 text={updatingClub ? 'Enregistrement...' : 'Enregistrer'}
-                                                dragon="Pura"
-                                                border="Pura"
+                                                dragon="Yinva"
+                                                border="Artrish"
                                                 class="h-10 w-full font-title text-xs uppercase tracking-wider !text-black"
                                             />
                                         </div>

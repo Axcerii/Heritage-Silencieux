@@ -5,9 +5,10 @@
     import type { AuthSession } from '$lib/auth-client';
     import BookDetails from '$lib/components/books/BookDetails.svelte';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
+    import { sidebarState } from '$lib/sidebar.svelte';
 
     let { data } = $props<{
-        data: { clubSlug: string; bookId: string; session: AuthSession };
+        data: { clubSlug: string; bookSlug: string; session: AuthSession };
     }>();
 
     let club = $state<Club | null>(null);
@@ -20,7 +21,7 @@
     $effect(() => {
         if (club && book) {
             breadcrumbs.set([
-                { label: 'Cercles', href: '/' },
+                { label: 'Bibliothèques', href: '/' },
                 { label: club.name, href: `/clubs/${club.slug}` },
                 { label: book.title }
             ]);
@@ -34,7 +35,7 @@
             const allClubs = await getClubs();
             club = allClubs.find(c => c.slug === data.clubSlug) || null;
             if (!club) {
-                error = "Cercle introuvable.";
+                error = "Bibliothèque introuvable.";
                 return;
             }
 
@@ -44,7 +45,7 @@
                 userRole = myMember.role;
             }
 
-            book = await getBookDetails(data.clubSlug, data.bookId);
+            book = await getBookDetails(data.clubSlug, data.bookSlug);
         } catch (e: any) {
             error = e.message || "Erreur lors du chargement du livre.";
         } finally {
@@ -57,7 +58,7 @@
     }
 
     function handleReadChapter(chapter: Chapter) {
-        goto(`/clubs/${data.clubSlug}/books/${data.bookId}/read/${chapter.index}`);
+        goto(`/clubs/${data.clubSlug}/books/${book?.slug || data.bookSlug}/read/${chapter.index}`);
     }
 
     onMount(() => {
@@ -83,7 +84,7 @@
     </div>
 {:else}
 
-    <main class="py-6 flex-1 flex flex-col justify-center">
+    <main class="w-full space-y-6 flex-1 transition-all duration-300 {userRole !== null || data.session?.user?.role === 'ADMIN' ? (sidebarState.isOpen ? 'p-4 sm:p-8 md:pl-72 lg:pl-72' : 'p-4 sm:p-8 md:pl-8 lg:pl-72') : 'max-w-6xl mx-auto p-4 sm:p-6'}">
         <BookDetails 
             clubSlug={data.clubSlug}
             {book}

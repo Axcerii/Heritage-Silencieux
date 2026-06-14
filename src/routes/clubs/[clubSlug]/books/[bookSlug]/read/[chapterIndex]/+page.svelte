@@ -6,7 +6,7 @@
     import BookReader from '$lib/components/chapters/BookReader.svelte';
 
     let { data } = $props<{
-        data: { clubSlug: string; bookId: string; chapterIndex: number; session: AuthSession };
+        data: { clubSlug: string; bookSlug: string; chapterIndex: number; session: AuthSession };
     }>();
 
     let club = $state<Club | null>(null);
@@ -23,14 +23,14 @@
             const allClubs = await getClubs();
             club = allClubs.find(c => c.slug === data.clubSlug) || null;
             if (!club) {
-                error = "Cercle introuvable.";
+                error = "Bibliothèque introuvable.";
                 return;
             }
 
-            book = await getBookDetails(data.clubSlug, data.bookId);
-            const chaptersResponse = await getChapters(data.clubSlug, data.bookId);
+            book = await getBookDetails(data.clubSlug, data.bookSlug);
+            const chaptersResponse = await getChapters(data.clubSlug, data.bookSlug);
             chapters = chaptersResponse.data;
-            activeChapter = await getChapter(data.clubSlug, data.bookId, data.chapterIndex);
+            activeChapter = await getChapter(data.clubSlug, data.bookSlug, data.chapterIndex);
         } catch (e: any) {
             error = e.message || "Erreur lors du chargement du grimoire.";
         } finally {
@@ -39,11 +39,11 @@
     }
 
     function handleBackToBook() {
-        goto(`/clubs/${data.clubSlug}/books/${data.bookId}`);
+        goto(`/clubs/${data.clubSlug}/books/${book?.slug || data.bookSlug}`);
     }
 
     function handleNavigate(chapter: Chapter) {
-        goto(`/clubs/${data.clubSlug}/books/${data.bookId}/read/${chapter.index}`);
+        goto(`/clubs/${data.clubSlug}/books/${book?.slug || data.bookSlug}/read/${chapter.index}`);
     }
 
     // Reload chapter if URL index changes
@@ -66,7 +66,7 @@
 {:else if error || !club || !book || !activeChapter}
     <div class="w-full max-w-md mx-auto my-12 p-6 border border-Chronos/30 bg-Chronos/10 text-Chronos rounded-lg text-center font-text">
         <p class="mb-4">{error || "Chapitre introuvable."}</p>
-        <a href="/clubs/{data.clubSlug}/books/{data.bookId}" class="px-4 py-2 bg-Chronos text-white rounded font-title hover:bg-Chronos/85 transition-colors inline-block">
+        <a href="/clubs/{data.clubSlug}/books/{book?.slug || data.bookSlug}" class="px-4 py-2 bg-Chronos text-white rounded font-title hover:bg-Chronos/85 transition-colors inline-block">
             Retour à l'ouvrage
         </a>
     </div>
@@ -74,7 +74,7 @@
     <main class="py-2 flex-1 flex flex-col justify-center">
         <BookReader 
             clubSlug={data.clubSlug}
-            bookId={data.bookId}
+            bookId={book.slug}
             bookTitle={book.title}
             initialChapter={activeChapter}
             {chapters}

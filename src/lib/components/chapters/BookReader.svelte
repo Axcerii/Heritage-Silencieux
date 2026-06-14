@@ -615,8 +615,8 @@
                     loadChapter(prevChapter);
                 }}
                 disabled={!prevChapter}
-                dragon={isFirstPageOfChapter ? "Chronos" : "Lada"}
-                border={isFirstPageOfChapter ? "Chronos" : "Lada"}
+                dragon={isFirstPageOfChapter ? "Shizari" : "Lada"}
+                border={isFirstPageOfChapter ? "Shizari" : "Lada"}
                 class="h-10 w-full sm:w-auto px-4 {isFirstPageOfChapter ? '!text-white' : '!text-Shizari'} disabled:opacity-30"
             />
             
@@ -640,8 +640,8 @@
                     loadChapter(nextChapter);
                 }}
                 disabled={!nextChapter}
-                dragon={isLastPageOfChapter ? "Chronos" : "Lada"}
-                border={isLastPageOfChapter ? "Chronos" : "Lada"}
+                dragon={isLastPageOfChapter ? "Shizari" : "Lada"}
+                border={isLastPageOfChapter ? "Shizari" : "Lada"}
                 class="h-10 w-full sm:w-auto px-4 {isLastPageOfChapter ? '!text-white' : '!text-black'} disabled:opacity-30"
             />
         </div>
