@@ -39,6 +39,7 @@
     let editTitle = $state(book.title);
     let editAuthor = $state(book.author);
     let editGenre = $state(book.genre);
+    let editSlug = $state(book.slug);
     let editTheme = $state(book.theme || '');
     let updatingBook = $state(false);
     let updateBookError = $state<string | null>(null);
@@ -71,6 +72,7 @@
             editTitle = book.title;
             editAuthor = book.author;
             editGenre = book.genre;
+            editSlug = book.slug;
             editTheme = book.theme || '';
         }
     });
@@ -107,17 +109,23 @@
         updateBookError = null;
         updateBookSuccess = false;
         try {
+            const oldSlug = book.slug;
             const updated = await updateBook(clubSlug, book.id, {
                 title: editTitle.trim(),
                 author: editAuthor.trim(),
                 genre: editGenre.trim(),
-                theme: (editTheme as any) || null
+                theme: (editTheme as any) || null,
+                slug: editSlug.trim() || undefined
             });
+            const slugChanged = oldSlug !== updated.slug;
             book = updated;
             updateBookSuccess = true;
             setTimeout(() => {
                 updateBookSuccess = false;
             }, 3000);
+            if (slugChanged) {
+                goto(`/clubs/${clubSlug}/books/${updated.slug}`, { replaceState: true });
+            }
         } catch (err: any) {
             updateBookError = err.message || 'Erreur lors de la mise à jour du livre.';
         } finally {
@@ -146,7 +154,7 @@
 
         deletingChapters = { ...deletingChapters, [index]: true };
         try {
-            await deleteChapter(clubSlug, book.id, index);
+            await deleteChapter(clubSlug, book.slug, index);
             await loadData();
         } catch (err: any) {
             alert(`Erreur lors de la suppression du chapitre : ${err.message}`);
@@ -163,7 +171,7 @@
     async function loadData() {
         // Chapters
         try {
-            const response = await getChapters(clubSlug, book.id);
+            const response = await getChapters(clubSlug, book.slug);
             chapters = response.data;
 
         } catch (e) {
@@ -174,7 +182,7 @@
 
         // Progression
         try {
-            progression = await getProgression(clubSlug, book.id);
+            progression = await getProgression(clubSlug, book.slug);
         } catch (e) {
             console.error('Failed to load progression:', e);
         } finally {
@@ -183,7 +191,7 @@
 
         // Reviews
         try {
-            reviews = await getReviews(clubSlug, book.id);
+            reviews = await getReviews(clubSlug, book.slug);
             const existingReview = reviews.find(r => r.userId === session.user.id);
             if (existingReview) {
                 newReviewRating = existingReview.rating;
@@ -198,7 +206,7 @@
         // Global progressions (if permitted)
         if (canViewGlobalProgress) {
             try {
-                globalProgressions = await getGlobalProgressions(clubSlug, book.id);
+                globalProgressions = await getGlobalProgressions(clubSlug, book.slug);
             } catch (e) {
                 console.error('Failed to load global progressions:', e);
             }
@@ -209,10 +217,10 @@
         const newReadState = !chapter.isRead;
         chapter.isRead = newReadState;
         try {
-            await toggleChapterRead(clubSlug, book.id, chapter.index, newReadState);
-            progression = await getProgression(clubSlug, book.id);
+            await toggleChapterRead(clubSlug, book.slug, chapter.index, newReadState);
+            progression = await getProgression(clubSlug, book.slug);
             if (canViewGlobalProgress) {
-                globalProgressions = await getGlobalProgressions(clubSlug, book.id);
+                globalProgressions = await getGlobalProgressions(clubSlug, book.slug);
             }
         } catch (e: any) {
             chapter.isRead = !newReadState;
@@ -225,7 +233,7 @@
         submittingReview = true;
         reviewError = null;
         try {
-            const created = await createReview(clubSlug, book.id, newReviewRating, newReviewComment || undefined);
+            const created = await createReview(clubSlug, book.slug, newReviewRating, newReviewComment || undefined);
             
             // Add or replace the user's review in state
             const existingIndex = reviews.findIndex(r => r.userId === session.user.id);
@@ -332,7 +340,7 @@
                 <div class="flex flex-col gap-2">
                     <Cta 
                         text="Écrire un Chapitre"
-                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.slug}/write`)}
                         dragon="Artrish"
                         border="Yinva"
                         class="h-9 px-4 font-title text-[13px] uppercase tracking-wider !text-black w-full flex items-center justify-center cursor-pointer"
@@ -377,7 +385,7 @@
                     <div>
                         <Cta 
                             text="Écrire"
-                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.slug}/write`)}
                             dragon="Artrish"
                             border="Yinva"
                             class="h-8 px-3 font-title text-xs uppercase tracking-wider !text-black flex items-center justify-center cursor-pointer"
@@ -474,7 +482,7 @@
                     {#if canManageChapters}
                         <Cta 
                             text="Écrire un Chapitre"
-                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                            onClick={() => goto(`/clubs/${clubSlug}/books/${book.slug}/write`)}
                             dragon="Artrish"
                             border="Yinva"
                             class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
@@ -696,6 +704,17 @@
                                 class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
                             />
                         </div>
+
+                        <div>
+                            <label for="edit-slug" class="block text-xs font-text text-gray-300 mb-1">Slug URL</label>
+                            <input 
+                                type="text" 
+                                id="edit-slug" 
+                                bind:value={editSlug}
+                                required
+                                class="w-full bg-primary/10 text-white border border-gray-800 focus:border-secondary focus:ring-1 focus:ring-secondary/30 rounded-[var(--radius)] h-11 px-3 text-sm transition-all focus:outline-none"
+                            />
+                        </div>
                     </div>
 
                     <!-- Right pane (dragon checkboxes grid) -->
@@ -765,7 +784,7 @@
                     <h3 class="text-xl font-title text-secondary tracking-wider">Gestion des Chapitres</h3>
                     <Cta 
                         text="Écrire un Chapitre"
-                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write`)}
+                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.slug}/write`)}
                         dragon="Artrish"
                         border="Yinva"
                         class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-black"
@@ -792,7 +811,7 @@
                                 <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
                                     <Cta 
                                         text="Modifier"
-                                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.id}/write?index=${chapter.index}`)}
+                                        onClick={() => goto(`/clubs/${clubSlug}/books/${book.slug}/write?index=${chapter.index}`)}
                                         dragon="none"
                                         border="Yinva"
                                         class="h-8 w-auto px-3 font-title text-xs uppercase tracking-wider !text-secondary border border-secondary/30 hover:bg-secondary/10"

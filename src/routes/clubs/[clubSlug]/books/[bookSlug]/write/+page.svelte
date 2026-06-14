@@ -13,7 +13,7 @@
     import 'easymde/dist/easymde.min.css';
 
     let { data } = $props<{
-        data: { clubSlug: string; bookId: string };
+        data: { clubSlug: string; bookSlug: string };
     }>();
 
     // Svelte 5 States
@@ -26,7 +26,7 @@
             breadcrumbs.set([
                 { label: 'Bibliothèques', href: '/' },
                 { label: club.name, href: `/clubs/${club.slug}` },
-                { label: book.title, href: `/clubs/${club.slug}/books/${book.id}` },
+                { label: book.title, href: `/clubs/${club.slug}/books/${book.slug}` },
                 { label: isEditMode ? `Modifier le Chapitre ${editIndex}` : 'Nouveau Chapitre' }
             ]);
         }
@@ -53,7 +53,7 @@
 
     // LocalStorage Draft states
     let restoredFromDraft = $state(false);
-    const localStorageKey = $derived(`draft-chapter-${data.clubSlug}-${data.bookId}-${isEditMode ? editIndex : 'new'}`);
+    const localStorageKey = $derived(`draft-chapter-${data.clubSlug}-${data.bookSlug}-${isEditMode ? editIndex : 'new'}`);
 
     function saveDraft(contentOverride?: string) {
         const content = contentOverride !== undefined ? contentOverride : (easyMDEInstance ? easyMDEInstance.value() : '');
@@ -110,8 +110,8 @@
                 return;
             }
 
-            book = await getBookDetails(data.clubSlug, data.bookId);
-            const chaptersResponse = await getChapters(data.clubSlug, data.bookId);
+            book = await getBookDetails(data.clubSlug, data.bookSlug);
+            const chaptersResponse = await getChapters(data.clubSlug, data.bookSlug);
             chapters = chaptersResponse.data;
 
             let initialContent = '';
@@ -128,7 +128,7 @@
             // 4. Load chapter context if in edit mode
             if (isEditMode) {
                 try {
-                    targetChapter = await getChapter(data.clubSlug, data.bookId, editIndex);
+                    targetChapter = await getChapter(data.clubSlug, data.bookSlug, editIndex);
                     
                     const hasDifferences = savedDraft && (
                         (savedDraft.title !== undefined && savedDraft.title !== targetChapter.title) ||
@@ -202,7 +202,7 @@
                         try {
                             const formData = new FormData();
                             formData.append('file', file);
-                            const res = await fetch(`${BACKEND_BASE}/clubs/${data.clubSlug}/books/${data.bookId}/chapters/upload`, {
+                            const res = await fetch(`${BACKEND_BASE}/clubs/${data.clubSlug}/books/${data.bookSlug}/chapters/upload`, {
                                 method: 'POST',
                                 body: formData,
                                 credentials: 'include'
@@ -244,13 +244,13 @@
 
         try {
             if (isEditMode) {
-                await updateChapter(data.clubSlug, data.bookId, editIndex, {
+                await updateChapter(data.clubSlug, data.bookSlug, editIndex, {
                     index: chapterIndex,
                     title: chapterTitle,
                     content: content
                 });
             } else {
-                await createChapter(data.clubSlug, data.bookId, {
+                await createChapter(data.clubSlug, data.bookSlug, {
                     index: chapterIndex,
                     title: chapterTitle,
                     content: content
@@ -259,7 +259,7 @@
             // Remove the auto-saved draft from localStorage upon successful save
             localStorage.removeItem(localStorageKey);
             // Navigate back to book details page
-            goto(`/clubs/${data.clubSlug}/books/${data.bookId}`);
+            goto(`/clubs/${data.clubSlug}/books/${book?.slug || data.bookSlug}`);
         } catch (e: any) {
             saveError = e.message || "Erreur lors de la sauvegarde.";
         } finally {
@@ -268,7 +268,7 @@
     }
 
     function handleCancel() {
-        goto(`/clubs/${data.clubSlug}/books/${data.bookId}`);
+        goto(`/clubs/${data.clubSlug}/books/${book?.slug || data.bookSlug}`);
     }
 
     onMount(() => {
@@ -294,7 +294,7 @@
 {:else if error || !club || !book}
     <div class="w-full max-w-md mx-auto my-12 p-6 border border-Chronos/30 bg-Chronos/10 text-Chronos rounded-lg text-center font-text">
         <p class="mb-4">{error || "Grimoire ou configuration introuvable."}</p>
-        <a href="/clubs/{data.clubSlug}/books/{data.bookId}" class="px-4 py-2 bg-Chronos text-white rounded font-title hover:bg-Chronos/85 transition-colors inline-block">
+        <a href="/clubs/{data.clubSlug}/books/{book?.slug || data.bookSlug}" class="px-4 py-2 bg-Chronos text-white rounded font-title hover:bg-Chronos/85 transition-colors inline-block">
             Retour à l'ouvrage
         </a>
     </div>

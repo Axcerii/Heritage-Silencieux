@@ -8,7 +8,7 @@
     import { sidebarState } from '$lib/sidebar.svelte';
 
     let { data } = $props<{
-        data: { clubSlug: string; bookId: string; session: AuthSession };
+        data: { clubSlug: string; bookSlug: string; session: AuthSession };
     }>();
 
     let club = $state<Club | null>(null);
@@ -45,7 +45,7 @@
                 userRole = myMember.role;
             }
 
-            book = await getBookDetails(data.clubSlug, data.bookId);
+            book = await getBookDetails(data.clubSlug, data.bookSlug);
         } catch (e: any) {
             error = e.message || "Erreur lors du chargement du livre.";
         } finally {
@@ -58,7 +58,7 @@
     }
 
     function handleReadChapter(chapter: Chapter) {
-        goto(`/clubs/${data.clubSlug}/books/${data.bookId}/read/${chapter.index}`);
+        goto(`/clubs/${data.clubSlug}/books/${book?.slug || data.bookSlug}/read/${chapter.index}`);
     }
 
     onMount(() => {

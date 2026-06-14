@@ -150,7 +150,7 @@
     }
 
     function handleSelectBook(book: Book) {
-        goto(`/clubs/${data.clubSlug}/books/${book.id}`);
+        goto(`/clubs/${data.clubSlug}/books/${book.slug}`);
     }
 
     async function handleExportCsv() {

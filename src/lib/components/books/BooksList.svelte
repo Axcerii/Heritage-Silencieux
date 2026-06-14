@@ -38,6 +38,7 @@
     let newBookTitle = $state('');
     let newBookAuthor = $state('');
     let newBookGenre = $state('');
+    let newBookSlug = $state('');
     let newBookTheme = $state<DragonTheme | ''>('');
     let adding = $state(false);
     let addError = $state<string | null>(null);
@@ -84,13 +85,15 @@
                 title: newBookTitle,
                 author: newBookAuthor,
                 genre: newBookGenre,
-                theme: newBookTheme || undefined
+                theme: newBookTheme || undefined,
+                slug: newBookSlug.trim() || undefined
             });
             books = [created, ...books];
             showAddModal = false;
             newBookTitle = '';
             newBookAuthor = '';
             newBookGenre = '';
+            newBookSlug = '';
             newBookTheme = '';
         } catch (e: any) {
             addError = e.message || 'Erreur lors de la création du livre.';
@@ -220,6 +223,17 @@
                             placeholder="Ex: Aventure" 
                             bind:value={newBookGenre}
                             required
+                            class="w-full bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm rounded-[var(--radius)] font-text"
+                        />
+                    </div>
+
+                    <div>
+                        <label for="book-slug" class="block text-xs font-text text-gray-300 mb-1">Slug URL (optionnel)</label>
+                        <input 
+                            type="text" 
+                            id="book-slug" 
+                            placeholder="Ex: le-comte-de-monte-cristo" 
+                            bind:value={newBookSlug}
                             class="w-full bg-primary text-black border border-foreground/30 focus:border-secondary h-10 px-3 text-sm rounded-[var(--radius)] font-text"
                         />
                     </div>

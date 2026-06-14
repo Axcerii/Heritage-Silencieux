@@ -29,8 +29,8 @@ export const breadcrumbs = {
             result.push({ label: 'Bibliothèque', href: `/clubs/${clubSlug}` });
             
             if (parts[2] === 'books' && parts[3]) {
-                const bookId = parts[3];
-                result.push({ label: 'Grimoire', href: `/clubs/${clubSlug}/books/${bookId}` });
+                const bookSlug = parts[3];
+                result.push({ label: 'Grimoire', href: `/clubs/${clubSlug}/books/${bookSlug}` });
                 
                 if (parts[4] === 'read' && parts[5]) {
                     result.push({ label: `Chapitre ${parts[5]}` });
