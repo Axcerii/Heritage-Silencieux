@@ -293,4 +293,12 @@
             {/if}
         </div>
     </div>
+    <a
+        href="/cgu"
+        target="_blank"
+        class="mt-4 text-[11px] font-title tracking-widest uppercase text-gray-600 hover:text-secondary transition-colors duration-200 z-10 mx-auto flex justify-center"
+    >
+        Conditions Générales d'Utilisation
+    </a>
 </div>
+

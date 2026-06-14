@@ -101,8 +101,9 @@
     <link rel="icon" href={favicon} />
     <title>Heritage Silencieux</title>
 </svelte:head>
-
-{#if !currentSession}
+{#if page.url.pathname.startsWith('/cgu')}
+    {@render children()}
+{:else if !currentSession}
     <AuthPage onAuthenticated={handleAuthenticated} />
 {:else}
     <div class="min-h-screen bg-background text-foreground font-text flex flex-col relative overflow-x-hidden">
@@ -232,6 +233,16 @@
         <main class="flex-1 min-w-0 overflow-y-auto overflow-x-hidden flex flex-col relative">
             {@render children()}
         </main>
+
+        <!-- Footer -->
+        <footer class="px-6 py-3 flex items-center justify-center z-10">
+            <a
+                href="/cgu"
+                class="text-[11px] font-title tracking-widest uppercase text-gray-600 hover:text-secondary transition-colors duration-200"
+            >
+                Conditions Générales d'Utilisation
+            </a>
+        </footer>
 
         <!-- Floating Admin FAB (Yinva) -->
         {#if currentSession.user.role === 'ADMIN' && page.url.pathname !== '/admin'}
