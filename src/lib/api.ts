@@ -1,4 +1,6 @@
-export const BACKEND_BASE = 'http://localhost:3000';
+import { env } from '$env/dynamic/public';
+
+export const BACKEND_BASE = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
 
 export type DragonTheme = 'Aqua' | 'Artrish' | 'Chronos' | 'Drii' | 'Goliath' | 'Guizamark' | 'Lada' | 'Pestia' | 'Pura' | 'Shizari' | 'Yinva';
 

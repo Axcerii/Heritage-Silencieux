@@ -1,4 +1,7 @@
-const API_BASE = 'http://localhost:3000/api/auth';
+import { env } from '$env/dynamic/public';
+
+export const BACKEND_BASE = env.PUBLIC_BACKEND_URL || 'http://localhost:3000';
+const API_BASE = `${BACKEND_BASE}/api/auth`;
 
 export interface User {
     id: string;
@@ -84,7 +87,7 @@ export async function signInGoogle(): Promise<void> {
         },
         body: JSON.stringify({ 
             provider: 'google', 
-            callbackURL: 'http://localhost:5173/' 
+            callbackURL: typeof window !== 'undefined' ? `${window.location.origin}/` : 'http://localhost:5173/' 
         }),
         credentials: 'include'
     });
