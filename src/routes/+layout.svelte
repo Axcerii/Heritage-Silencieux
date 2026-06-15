@@ -6,6 +6,7 @@
     import AuthPage from '$lib/components/auth/AuthPage.svelte';
     import { signOut, type AuthSession } from '$lib/auth-client';
     import { page } from '$app/state';
+    import { BACKEND_BASE } from '$lib/api';
     import { breadcrumbs } from '$lib/breadcrumbs.svelte';
     import { censorEmail, getImageUrl, getUserAvatarDragon } from '$lib';
     import { sidebarState } from '$lib/sidebar.svelte';
@@ -74,7 +75,7 @@
         
         uploadingProfilePic = true;
         try {
-            const response = await fetch('http://localhost:3000/api/users/profile-picture', {
+            const response = await fetch(`${BACKEND_BASE}/api/users/profile-picture`, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
