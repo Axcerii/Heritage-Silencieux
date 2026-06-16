@@ -47,7 +47,7 @@
 
     <!-- Page Body -->
     <div 
-        style="font-size: {fontSize}px; max-height: {isDesktop ? '480px' : '420px'};" 
+        style="font-size: {fontSize}px; max-height: {isDesktop ? '550px' : '470px'};" 
         class="prose prose-stone text-justify leading-relaxed break-words text-sm sm:text-base md:text-lg flex-1 min-h-0 select-text max-w-none prose-p:my-2 prose-p:text-[#2c251e] prose-strong:text-[#2c251e] prose-em:text-[#2c251e] prose-li:text-[#2c251e] prose-headings:text-[#524332] prose-headings:font-title prose-headings:my-2 prose-img:rounded-[var(--radius)] prose-img:border prose-img:border-secondary/20 prose-img:my-3 prose-img:mx-auto prose-img:max-h-[340px] md:prose-img:max-h-[400px] prose-img:object-contain"
     >
         {@html content || ''}

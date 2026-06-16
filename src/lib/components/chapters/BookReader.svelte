@@ -5,7 +5,7 @@
     import { marked } from 'marked';
     import BookPage from './BookPage.svelte';
 
-    let { clubSlug, bookId, bookTitle, initialChapter, chapters, bookPages, onBack, onNavigateChapter } = $props<{
+    let props = $props<{
         clubSlug: string;
         bookId: string;
         bookTitle?: string;
@@ -16,12 +16,22 @@
         onNavigateChapter?: (chapter: Chapter) => void;
     }>();
 
+    const clubSlug = $derived(props.clubSlug);
+    const bookId = $derived(props.bookId);
+    const bookTitle = $derived(props.bookTitle);
+    const initialChapter = $derived(props.initialChapter);
+    const chapters = $derived(props.chapters);
+    const bookPages = $derived(props.bookPages);
+    const onBack = $derived(props.onBack);
+    const onNavigateChapter = $derived(props.onNavigateChapter);
+
     let currentChapter = $state<Chapter>(initialChapter);
     let loading = $state(false);
     let error = $state<string | null>(null);
 
     // Font size setting for accessibility
     let fontSize = $state(18); // default px
+    let hasLoadedFontSize = $state(false);
 
     // Pagination states
     let pages = $state<string[]>(['']);
@@ -29,6 +39,9 @@
     let bookContainerWidth = $state(800);
     let direction = $state(1); // 1 for next, -1 for prev
     let shouldStartAtEnd = $state(false);
+
+    let lastLoadedChapterId: string | null = null;
+    let hasRestored = $state(false);
 
     // DOM references
     let offscreenMeasurer = $state<HTMLElement | null>(null);
@@ -39,7 +52,7 @@
     const horizontalPadding = $derived(isDesktop ? 64 : 48);
 
     // Dynamic max content height based on device view height
-    const maxContentHeight = $derived(isDesktop ? 480 : 420);
+    const maxContentHeight = $derived(isDesktop ? 550 : 470);
 
     // Derived progress percentage through the current chapter
     const progressPercent = $derived(
@@ -73,6 +86,9 @@
     const currentIndex = $derived(chapters.findIndex((c: Chapter) => c.id === currentChapter.id));
     const prevChapter = $derived(currentIndex > 0 ? chapters[currentIndex - 1] : null);
     const nextChapter = $derived(currentIndex < chapters.length - 1 ? chapters[currentIndex + 1] : null);
+
+    const hasPrev = $derived(currentPageIndex > 0 || prevChapter !== null);
+    const hasNext = $derived(currentPageIndex + (isDesktop ? 2 : 1) < pages.length || nextChapter !== null);
 
     // Debounced pagination trigger to prevent lag during active resizing
     let paginationTimeout: any;
@@ -261,6 +277,7 @@
             const lastIdx = pages.length - 1;
             currentPageIndex = isDesktop ? (lastIdx - (lastIdx % 2)) : lastIdx;
             shouldStartAtEnd = false;
+            hasRestored = true;
         } else {
             if (currentPageIndex >= pages.length) {
                 currentPageIndex = Math.max(0, pages.length - (isDesktop ? 2 : 1));
@@ -317,6 +334,36 @@
         }
     }
 
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+
+    function handleTouchStart(e: TouchEvent) {
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+    }
+
+    function handleTouchEnd(e: TouchEvent) {
+        touchEndX = e.changedTouches[0].screenX;
+        touchEndY = e.changedTouches[0].screenY;
+        handleSwipeGesture();
+    }
+
+    function handleSwipeGesture() {
+        const diffX = touchEndX - touchStartX;
+        const diffY = touchEndY - touchStartY;
+        
+        // Swipe threshold: 50px, must be primarily horizontal
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            if (diffX > 0) {
+                prevPage();
+            } else {
+                nextPage();
+            }
+        }
+    }
+
     function handlePageInputChange(e: Event) {
         const val = parseInt((e.currentTarget as HTMLInputElement).value);
         if (!isNaN(val) && val >= 1 && val <= pages.length) {
@@ -348,15 +395,44 @@
         }
     });
 
-    // Sync external initialChapter prop to currentChapter state and reset page index on navigation
+    // Restore page index from localStorage when chapter changes or on mount
+    $effect(() => {
+        if (currentChapter && currentChapter.id !== lastLoadedChapterId) {
+            lastLoadedChapterId = currentChapter.id;
+            hasRestored = false;
+            if (!shouldStartAtEnd) {
+                const savedPage = typeof window !== 'undefined'
+                    ? localStorage.getItem(`read_page_${clubSlug}_${bookId}_${currentChapter.index}`)
+                    : null;
+                currentPageIndex = savedPage !== null ? (parseInt(savedPage, 10) || 0) : 0;
+                hasRestored = true;
+            }
+        }
+    });
+
+    // Save page index to localStorage when page index or chapter changes
+    $effect(() => {
+        if (hasRestored && typeof window !== 'undefined' && currentChapter?.id) {
+            localStorage.setItem(
+                `read_page_${clubSlug}_${bookId}_${currentChapter.index}`,
+                currentPageIndex.toString()
+            );
+        }
+    });
+
+    // Sync external initialChapter prop to currentChapter state
     $effect(() => {
         if (initialChapter) {
             if (currentChapter.id !== initialChapter.id) {
                 currentChapter = initialChapter;
-                if (!shouldStartAtEnd) {
-                    currentPageIndex = 0;
-                }
             }
+        }
+    });
+
+    // Save user's preferred font size in localStorage when it changes
+    $effect(() => {
+        if (hasLoadedFontSize && typeof window !== 'undefined') {
+            localStorage.setItem('reader_font_size', fontSize.toString());
         }
     });
 
@@ -405,6 +481,12 @@
     }
 
     onMount(() => {
+        const savedFontSize = localStorage.getItem('reader_font_size');
+        if (savedFontSize !== null) {
+            fontSize = parseInt(savedFontSize, 10) || 18;
+        }
+        hasLoadedFontSize = true;
+
         if (!onNavigateChapter) {
             loadChapter(initialChapter);
         }
@@ -422,44 +504,12 @@
     ></div>
 </div>
 
-<div class="w-full max-w-6xl mx-auto px-10 sm:px-12 py-2 sm:py-4 space-y-3 sm:space-y-4 select-none">
+<div class="w-full max-w-6xl mx-auto px-2 sm:px-12 py-2 sm:py-4 space-y-3 sm:space-y-4 select-none">
     <!-- Header Tools -->
     <div class="flex items-center justify-between border-b border-gray-800 pb-2">
         <div class="flex items-center space-x-3">
             <button onclick={onBack} class="text-secondary font-title text-sm tracking-wider hover:underline cursor-pointer">
                 ← Fermer le Grimoire
-            </button>
-            {#if bookTitle}
-                <span class="text-gray-600">|</span>
-                <span class="text-gray-300 font-title text-sm tracking-wider uppercase font-semibold truncate max-w-[200px] sm:max-w-none">{bookTitle}</span>
-            {/if}
-        </div>
-
-        <!-- Read status badge -->
-        <div class="flex items-center space-x-2">
-            <span class="text-xs font-text uppercase tracking-widest text-gray-400">Statut :</span>
-            {#if currentChapter.isRead}
-                <span class="text-xs bg-secondary/20 text-secondary border border-secondary/30 px-2 py-0.5 rounded font-text font-bold">Lu</span>
-            {:else}
-                <span class="text-xs bg-gray-800 text-gray-400 border border-gray-700 px-2 py-0.5 rounded font-text">En cours</span>
-            {/if}
-        </div>
-
-        <!-- Font sizing controls -->
-        <div class="flex items-center space-x-3 bg-background/60 border border-gray-800 rounded px-3 py-1 font-text text-xs">
-            <span class="text-gray-400">Taille de police :</span>
-            <button 
-                onclick={() => fontSize = Math.max(14, fontSize - 2)} 
-                class="w-6 h-6 rounded bg-gray-800 text-white flex items-center justify-center hover:bg-gray-700 cursor-pointer"
-            >
-                A-
-            </button>
-            <span class="text-white font-semibold">{fontSize}px</span>
-            <button 
-                onclick={() => fontSize = Math.min(26, fontSize + 2)} 
-                class="w-6 h-6 rounded bg-gray-800 text-white flex items-center justify-center hover:bg-gray-700 cursor-pointer"
-            >
-                A+
             </button>
         </div>
     </div>
@@ -481,6 +531,48 @@
             />
         </div>
     {:else}
+        <!-- Book Header Bar (Title, Status, Font Size) -->
+        <div class="flex justify-center pt-2 select-none">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-[#1e1712]/80 border border-[#3e342b]/60 rounded-xl sm:rounded-full px-5 py-2 shadow-[0_4px_12px_rgba(0,0,0,0.5)] w-full">
+                <!-- Book Title -->
+                <div class="flex items-center space-x-3 min-w-0">
+                    {#if bookTitle}
+                        <span class="text-[#ebdcb9] font-title text-sm tracking-wider uppercase font-semibold truncate max-w-[200px] sm:max-w-xs">{bookTitle}</span>
+                    {/if}
+                </div>
+
+                <!-- Read status badge -->
+                <div class="flex items-center space-x-2 shrink-0">
+                    <span class="text-[10px] font-text uppercase tracking-widest text-gray-400">Statut :</span>
+                    {#if currentChapter.isRead}
+                        <span class="text-[10px] bg-secondary/20 text-secondary border border-secondary/30 px-2 py-0.5 rounded font-text font-bold">Lu</span>
+                    {:else}
+                        <span class="text-[10px] bg-gray-800 text-gray-400 border border-gray-700 px-2 py-0.5 rounded font-text">En cours</span>
+                    {/if}
+                </div>
+
+                <!-- Font Sizing Controls -->
+                <div class="flex items-center space-x-3 font-text text-xs shrink-0">
+                    <span class="text-gray-400 font-medium">Taille :</span>
+                    <button 
+                        onclick={() => fontSize = Math.max(14, fontSize - 2)} 
+                        class="w-6 h-6 rounded-full bg-[#2a2018] text-[#ebdcb9] border border-[#4e3f31] flex items-center justify-center hover:bg-[#3e3024] cursor-pointer transition-all active:scale-90 font-bold"
+                        title="Diminuer la taille du texte"
+                    >
+                        A-
+                    </button>
+                    <span class="text-[#ebdcb9] font-bold w-10 text-center font-title">{fontSize}px</span>
+                    <button 
+                        onclick={() => fontSize = Math.min(26, fontSize + 2)} 
+                        class="w-6 h-6 rounded-full bg-[#2a2018] text-[#ebdcb9] border border-[#4e3f31] flex items-center justify-center hover:bg-[#3e3024] cursor-pointer transition-all active:scale-90 font-bold"
+                        title="Agrandir la taille du texte"
+                    >
+                        A+
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Interactive Visual 3D Book Layout -->
         <div class="relative w-full py-4 select-none">
             <!-- Book Container Frame -->
@@ -489,7 +581,9 @@
                 <!-- Inner pages container -->
                 <div 
                     bind:clientWidth={bookContainerWidth}
-                    class="bg-[#faf4eb] text-[#2c251e] rounded-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.15)] relative min-h-[600px] max-h-[600px] md:min-h-[650px] md:max-h-[650px] overflow-visible flex flex-col md:flex-row transition-all duration-300"
+                    ontouchstart={handleTouchStart}
+                    ontouchend={handleTouchEnd}
+                    class="bg-[#faf4eb] text-[#2c251e] rounded-lg shadow-[inset_0_0_40px_rgba(0,0,0,0.15)] relative min-h-[650px] max-h-[650px] md:min-h-[720px] md:max-h-[720px] overflow-visible flex flex-col md:flex-row transition-all duration-300"
                     style="perspective: 3000px; transform-style: preserve-3d;"
                 >
                     <!-- Book spine divider/shadow (Desktop only) -->
@@ -556,6 +650,33 @@
                         </div>
                     {/if}
 
+                    <!-- Click navigation zones (Mobile only) -->
+                    {#if !isDesktop && hasPrev}
+                        <button 
+                            onclick={prevPage}
+                            class="absolute left-0 top-0 bottom-0 w-[30%] z-20 cursor-w-resize group text-left border-none bg-transparent focus:outline-none"
+                            aria-label="Page précédente"
+                        >
+                            <!-- Subtle hover gradient and chevron -->
+                            <div class="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-l-lg flex items-center justify-start pl-4">
+                                <span class="text-2xl font-bold text-[#524332]/50">←</span>
+                            </div>
+                        </button>
+                    {/if}
+
+                    {#if !isDesktop && hasNext}
+                        <button 
+                            onclick={nextPage}
+                            class="absolute right-0 top-0 bottom-0 w-[30%] z-20 cursor-e-resize group text-right border-none bg-transparent focus:outline-none"
+                            aria-label="Page suivante"
+                        >
+                            <!-- Subtle hover gradient and chevron -->
+                            <div class="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-r-lg flex items-center justify-end pr-4">
+                                <span class="text-2xl font-bold text-[#524332]/50">→</span>
+                            </div>
+                        </button>
+                    {/if}
+
                     <!-- Progression bar at the bottom of the pages -->
                     <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-[#ebdcb9]/40 z-20 overflow-hidden rounded-b-lg">
                         <div 
@@ -565,44 +686,48 @@
                     </div>
                 </div>
 
-                <!-- Floating Page Flip Buttons on the edges -->
-                <div class="absolute left-[-15px] sm:left-[-25px] top-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
-                    {#if isFirstPageOfChapter && prevChapter}
-                        <div class="absolute bottom-full mb-2 bg-Yinva/80 text-background text-[9px] sm:text-[10px] font-title uppercase tracking-widest px-2.5 py-1 rounded shadow-lg whitespace-nowrap animate-bounce">
-                            Chapitre Précédent
-                        </div>
-                    {/if}
-                    <button 
-                        onclick={prevPage}
-                        disabled={currentPageIndex === 0 && !prevChapter}
-                        class="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
-                            {isFirstPageOfChapter && prevChapter
-                                ? 'bg-Yinva hover:bg-Chronos text-background shadow-[0_0_15px_rgba(202,68,68,0.6)]' 
-                                : 'bg-Pura hover:bg-[#c2a665] text-black shadow-[0_4px_15px_rgba(0,0,0,0.5)]'}"
-                        title={isFirstPageOfChapter && prevChapter ? "Chapitre Précédent" : "Page Précédente"}
-                    >
-                        <span class="text-lg sm:text-2xl font-bold">←</span>
-                    </button>
-                </div>
+                <!-- Floating Page Flip Buttons on the edges (Desktop only) -->
+                {#if isDesktop}
+                    <div class="absolute left-[-15px] sm:left-[-25px] top-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
+                        {#if isFirstPageOfChapter && prevChapter}
+                            <div class="absolute bottom-full mb-2 bg-Yinva/80 text-background text-[9px] sm:text-[10px] font-title uppercase tracking-widest px-2.5 py-1 rounded shadow-lg whitespace-nowrap animate-bounce">
+                                Chapitre Précédent
+                            </div>
+                        {/if}
+                        <button 
+                            onclick={prevPage}
+                            disabled={currentPageIndex === 0 && !prevChapter}
+                            class="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
+                                {isFirstPageOfChapter && prevChapter
+                                    ? 'bg-Yinva hover:bg-Chronos text-background shadow-[0_0_15px_rgba(202,68,68,0.6)]' 
+                                    : 'bg-Pura hover:bg-[#c2a665] text-black shadow-[0_4px_15px_rgba(0,0,0,0.5)]'}"
+                            title={isFirstPageOfChapter && prevChapter ? "Chapitre Précédent" : "Page Précédente"}
+                        >
+                            <span class="text-lg sm:text-2xl font-bold">←</span>
+                        </button>
+                    </div>
 
-                <div class="absolute right-[-15px] sm:right-[-25px] top-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
-                    {#if isLastPageOfChapter && nextChapter}
-                        <div class="absolute bottom-full mb-2 bg-Yinva/80 text-background text-[9px] sm:text-[10px] font-title uppercase tracking-widest px-2.5 py-1 rounded shadow-lg whitespace-nowrap animate-bounce">
-                            Chapitre Suivant
-                        </div>
-                    {/if}
-                    <button 
-                        onclick={nextPage}
-                        disabled={currentPageIndex + (isDesktop ? 2 : 1) >= pages.length && !nextChapter}
-                        class="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
-                            {isLastPageOfChapter && nextChapter
-                                ? 'bg-Yinva hover:bg-Chronos text-background shadow-[0_0_15px_rgba(202,68,68,0.6)]' 
-                                : 'bg-Pura hover:bg-[#c2a665] text-black shadow-[0_4px_15px_rgba(0,0,0,0.5)]'}"
-                        title={isLastPageOfChapter && nextChapter ? "Chapitre Suivant" : "Page Suivante"}
-                    >
-                        <span class="text-lg sm:text-2xl font-bold">→</span>
-                    </button>
-                </div>
+                    <div class="absolute right-[-15px] sm:right-[-25px] top-1/2 -translate-y-1/2 z-30 flex flex-col items-center">
+                        {#if isLastPageOfChapter && nextChapter}
+                            <div class="absolute bottom-full mb-2 bg-Yinva/80 text-background text-[9px] sm:text-[10px] font-title uppercase tracking-widest px-2.5 py-1 rounded shadow-lg whitespace-nowrap animate-bounce">
+                                Chapitre Suivant
+                            </div>
+                        {/if}
+                        <button 
+                            onclick={nextPage}
+                            disabled={currentPageIndex + (isDesktop ? 2 : 1) >= pages.length && !nextChapter}
+                            class="w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
+                                {isLastPageOfChapter && nextChapter
+                                    ? 'bg-Yinva hover:bg-Chronos text-background shadow-[0_0_15px_rgba(202,68,68,0.6)]' 
+                                    : 'bg-Pura hover:bg-[#c2a665] text-black shadow-[0_4px_15px_rgba(0,0,0,0.5)]'}"
+                            title={isLastPageOfChapter && nextChapter ? "Chapitre Suivant" : "Page Suivante"}
+                        >
+                            <span class="text-lg sm:text-2xl font-bold">→</span>
+                        </button>
+                    </div>
+                {/if}
+
+
             </div>
         </div>
 
